@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WS xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+    <UF>
+        <sigla>SP</sigla>
+        <homologacao>
+            <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='1'>https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</PedidoConsultaNFePeriodo>
+        </homologacao>
+        <producao>
+            <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='1'>https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</PedidoConsultaNFePeriodo>
+        </producao>
+    </UF>
+</WS>

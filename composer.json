@@ -1,0 +1,44 @@
+{
+    "name": "Focus599Dev/sped-nfssp",
+    "type": "library",
+    "description": "API para geração e comunicação da NFSe prefeitura de São Paulo.",
+    "keywords": ["nfs","sped","nfephp"],
+    "homepage": "https://github.com/Focus599Dev/sped-nfssp",
+    "license": ["LGPL-3.0-or-later", "GPL-3.0-or-later", "MIT"],
+    "authors": [
+        {
+            "name": "Marlon Oliveira Barbosa",
+            "email": "marlon.academi@gmail.com",
+            "homepage": "https://github.com/Focus599Dev/sped-nfssp",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">= 5.6",
+        "Focus599Dev/sped-common" : "v5.0.30",
+        "justinrainbow/json-schema": "^5.2"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "NFePHP\\NFs\\SP\\": "src/"
+        } 
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NFePHP\\NFs\\SP\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit -c phpunit.xml.dist",
+        "phpcbf": "vendor/bin/phpcbf --standard=psr2 src; vendor/bin/phpcbf --standard=psr2 tests",
+        "phpcs": "vendor/bin/phpcs --standard=psr2 src; vendor/bin/phpcs --standard=psr2 tests"
+    },
+    "extra": {
+        "branch-alias": {
+            "0.0.1": "5.0-dev"
+        }
+    },
+    "minimum-stability": "stable"
+}
