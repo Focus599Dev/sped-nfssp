@@ -167,6 +167,8 @@ class Tools {
      */
     protected $modelo = 61;
 
+    protected $urlcUF = null;
+
     /**
      * Constructor
      * load configurations,
@@ -420,6 +422,7 @@ class Tools {
         $body = str_replace('<?xml version="1.0" encoding="utf-8"?>', '', $body);
         $body = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $body);
         return $body;
+        
     }
 
     public function makeBody($method, $mensagemXML){
@@ -433,6 +436,43 @@ class Tools {
         $body = "<" . $method . "Request xmlns=\"$this->urlPortal\">" . $request . "</" . $method . "Request>";
 
         return $body;
+    }
+
+    public function getLastRequest(){
+        return $this->lastRequest;
+    }
+
+    public function getLastResponse(){
+        return $this->lastResponse;
+    }
+
+    public function removeStuffs($xml)
+    {   
+
+        $xml = htmlspecialchars_decode($xml);
+
+        if (preg_match('/<soap:Body>/', $xml)) {
+
+            $tag = '<soap:Body>';
+            
+            $xml = substr($xml, (strpos($xml, $tag) + strlen($tag)), strlen($xml));
+
+            $tag = '</soap:Body>';
+
+            $xml = substr($xml, 0, strpos($xml, $tag));
+        }
+
+        $xml = preg_replace('/(xmlns)="([a-z:\/\.]){0,}"/', '', $xml);
+        
+        $xml = preg_replace('/(xmlns):([a-z]){1,}="([a-z:\/.0-9A-Z\-]){0,}"/', '', $xml);
+        
+        $xml = str_replace('Versao="1"', '', $xml);
+
+        $xml = $this->clear($xml);
+
+        $xml = trim($xml);
+
+        return $xml;
     }
 }
 
