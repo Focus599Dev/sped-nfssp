@@ -50,7 +50,7 @@ class Signer extends SignerCommon
         $root = $dom->getElementsByTagName('RPS');
 
         $textAss = self::getDataAssinatura($dom);
-
+       
         $signature = base64_encode($certificate->sign($textAss, $algorithm)); 
 
         $content = $root->item(0)->firstChild;
@@ -112,8 +112,9 @@ class Signer extends SignerCommon
             
             $node = str_pad($node->item(0)->nodeValue, 5, ' ', STR_PAD_RIGHT);
 
-        } else 
+        } else {
             $node = str_pad('', 5, ' ', STR_PAD_RIGHT);
+        }
 
         $textAss .= $node;
 
@@ -166,7 +167,7 @@ class Signer extends SignerCommon
         
         if ($node->length){
             
-            if ($node->item(0)->nodeValue == 'true')
+            if ($node->item(0)->nodeValue == '1')
                 $node = 'S';
             else 
                 $node = 'N';
