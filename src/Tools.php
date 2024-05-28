@@ -38,7 +38,7 @@ class Tools extends ToolsCommon{
         $request = Signer::assinatura(
             $this->certificate,
             $request,
-            OPENSSL_ALGO_SHA1,
+            OPENSSL_ALGO_SHA1
         );
 
         // $request = Signer::sign(
