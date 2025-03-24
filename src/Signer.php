@@ -110,10 +110,10 @@ class Signer extends SignerCommon
 
         if ($node->length){
             
-            $node = str_pad($node->item(0)->nodeValue, 5, ' ', STR_PAD_RIGHT);
+            $node = str_pad($node->item(0)->nodeValue, 5, chr(32), STR_PAD_RIGHT);
 
         } else {
-            $node = str_pad('', 5, ' ', STR_PAD_RIGHT);
+            $node = str_pad('', 5, chr(32), STR_PAD_RIGHT);
         }
 
         $textAss .= $node;
@@ -137,7 +137,7 @@ class Signer extends SignerCommon
             $node = self::removePointAndComa($node->item(0)->nodeValue);
 
         } else 
-            $node = str_pad('', 8, ' ', STR_PAD_LEFT);
+            $node = str_pad('', 8, chr(32), STR_PAD_LEFT);
 
         $textAss .= $node;
 
