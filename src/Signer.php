@@ -50,7 +50,7 @@ class Signer extends SignerCommon
         $root = $dom->getElementsByTagName('RPS');
 
         $textAss = self::getDataAssinatura($dom);
-       
+         var_dump($textAss );
         $signature = base64_encode($certificate->sign($textAss, $algorithm)); 
 
         $content = $root->item(0)->firstChild;
