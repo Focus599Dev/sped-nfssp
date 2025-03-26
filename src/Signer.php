@@ -50,7 +50,8 @@ class Signer extends SignerCommon
         $root = $dom->getElementsByTagName('RPS');
 
         $textAss = self::getDataAssinatura($dom);
-         var_dump($textAss );
+        
+        var_dump($textAss);
         $signature = base64_encode($certificate->sign($textAss, $algorithm)); 
 
         $content = $root->item(0)->firstChild;
@@ -110,7 +111,7 @@ class Signer extends SignerCommon
 
         if ($node->length){
             
-            $node = str_pad($node->item(0)->nodeValue, 5, chr(32), STR_PAD_RIGHT);
+            $node = str_pad($node->item(0)->nodeValue, 5,chr(32), STR_PAD_RIGHT);
 
         } else {
             $node = str_pad('', 5, chr(32), STR_PAD_RIGHT);
@@ -148,7 +149,7 @@ class Signer extends SignerCommon
             $node = $node->item(0)->nodeValue;
 
         } else 
-            $node = ' ';
+            $node = chr(32);
 
         $textAss .= $node;
 
@@ -159,7 +160,7 @@ class Signer extends SignerCommon
             $node = $node->item(0)->nodeValue;
 
         } else 
-            $node = ' ';
+            $node = chr(32);
 
         $textAss .= $node;
 
@@ -180,7 +181,7 @@ class Signer extends SignerCommon
         
         if ($node->length){
             
-            $node = str_pad( self::removePointAndComa($node->item(0)->nodeValue) , 15, '0', STR_PAD_LEFT);
+            $node = str_pad( self::removePointAndComa(  self::equalizeDecimalPlaces($node->item(0)->nodeValue, 2) ) , 15, '0', STR_PAD_LEFT);
            
         } else 
             $node = str_pad('' , 15, '0', STR_PAD_LEFT);
@@ -191,7 +192,7 @@ class Signer extends SignerCommon
         
         if ($node->length){
             
-            $node = str_pad( self::removePointAndComa($node->item(0)->nodeValue) , 15, '0', STR_PAD_LEFT);
+            $node = str_pad( self::removePointAndComa(  self::equalizeDecimalPlaces($node->item(0)->nodeValue, 2) ) , 15, '0', STR_PAD_LEFT);
            
         } else 
             $node = str_pad('' , 15, '0', STR_PAD_LEFT);
@@ -291,7 +292,19 @@ class Signer extends SignerCommon
     }
 
     private static function removePointAndComa($text){
-
+        
         return preg_replace('/(-|,|\.)/', '', $text);
+    }
+
+    private static function equalizeDecimalPlaces($value, $decimalPlaces){
+
+        try{
+
+            return number_format($value, $decimalPlaces, '.', '');
+
+        } catch (\Exception $e) {
+            return $value;
+        }
+
     }
 }
