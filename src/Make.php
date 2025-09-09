@@ -396,6 +396,12 @@ class Make{
 
         $CPFCNPJTomador = $this->dom->createElement('CPFCNPJTomador');
 
+		if ($std->TaxIDType == 1){
+        
+            $std->CpfCnpj = substr($std->CpfCnpj, -11);
+
+        }
+
         if ( strlen($std->CpfCnpj) >= 14){
 
             $this->dom->addChild(
