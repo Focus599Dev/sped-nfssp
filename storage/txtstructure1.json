@@ -2,7 +2,7 @@
     "NOTAFISCAL": "NOTAFISCAL|1|",
     "A": "A|NumeroLote|versao|",
     "B": "B|CpfCnpj|dtInicio|dtFim|ValorTotalServicos|ValorTotalDeducoes|transacao|QtdRPS|",
-    "E": "E|CpfCnpj|InscricaoMunicipalTomador|InscricaoEstadualTomador|RazaoSocialTomador|EmailTomador|",
+    "E": "E|CpfCnpj|InscricaoMunicipalTomador|InscricaoEstadualTomador|RazaoSocialTomador|EmailTomador|TaxIDType|",
     "E02": "E02|TipoLogradouro|Logradouro|NumeroEndereco|ComplementoEndereco|Bairro|Cidade|UF|CEP|",
     "H": "H|InscricaoPrestador|SerieRPS|NumeroRPS|",
     "H01": "H01|TipoRPS|DataEmissao|StatusRPS|TributacaoRPS|ValorServicos|ValorDeducoes|ValorPIS|ValorCOFINS|ValorINSS|ValorIR|ValorCSLL|CodigoServico|AliquotaServicos|ISSRetido|CPFCNPJIntermediario|InscricaoMunicipalIntermediario|ISSRetidoIntermediario|EmailIntermediario|ValorCargaTributaria|PercentualCargaTributaria|FonteCargaTributaria|CodigoCEI|MatriculaObra|MunicipioPrestacao|NumeroEncapsulamento|ValorTotalRecebido|",
