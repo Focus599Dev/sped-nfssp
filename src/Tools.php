@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace NFePHP\NFs\SP;
 
@@ -17,17 +17,23 @@ use NFePHP\Common\Strings;
 use NFePHP\NFs\SP\Make;
 use NFePHP\NFs\SP\Exception\InvalidArgumentException;
 
-class Tools extends ToolsCommon{
-    
-    public function enviaRPS($request){
+class Tools extends ToolsCommon
+{
 
-		if (empty($request)) {
+    public function enviaRPS($request)
+    {
+
+        if (empty($request)) {
             throw new InvalidArgumentException('$xml');
         }
         //remove all invalid strings
-        $request = Strings::clearXmlString($request);  
+        $request = Strings::clearXmlString($request);
 
-        $servico = 'EnvioRPS';
+        if ($this->tpAmb == '1') {
+            $servico = 'EnvioRPS';
+        } else {
+            $servico = 'TesteEnvioRPS';
+        }
 
         $this->servico(
             $servico,
@@ -58,7 +64,7 @@ class Tools extends ToolsCommon{
             $this->algorithm,
             $this->canonical
         );
-        
+
         $this->lastRequest = $request;
 
         $this->isValid($this->versao, $request, 'PedidoEnvioRPS');
@@ -66,14 +72,13 @@ class Tools extends ToolsCommon{
         $parameters = ['EnvioLoteRPS' => $request];
 
         $request = $this->makeBody($servico, $request);
-        
+
         $this->lastResponse = $this->sendRequest($request, $parameters);
-        
+
         $this->lastResponse = $this->removeStuffs($this->lastResponse);
 
         return $this->lastResponse;
-
-	}
+    }
 
     /**
      * Serviço de distribuição de informações de documentos eletronicos
@@ -91,12 +96,12 @@ class Tools extends ToolsCommon{
         $dateIni,
         $dateEnd,
         $page = 1,
-        $inscricao= ''
+        $inscricao = ''
     ) {
 
-		$servico = 'PedidoConsultaNFePeriodo';
+        $servico = 'PedidoConsultaNFePeriodo';
 
-		$this->servico(
+        $this->servico(
             $servico,
             'SP',
             $this->tpAmb,
@@ -105,16 +110,16 @@ class Tools extends ToolsCommon{
 
         $makeXML = new Make();
 
-        $consulta = $makeXML->GenerateXMLPedidoConsultaNFePeriodo($CPFCNPJRemet, $CPFCNPJ, $dateIni, $dateEnd, $inscricao,$page);
+        $consulta = $makeXML->GenerateXMLPedidoConsultaNFePeriodo($CPFCNPJRemet, $CPFCNPJ, $dateIni, $dateEnd, $inscricao, $page);
 
         $request = Signer::sign(
-                $this->certificate,
-                $consulta,
-                'PedidoConsultaNFePeriodo',
-                '',
-                $this->algorithm,
-                $this->canonical
-            );
+            $this->certificate,
+            $consulta,
+            'PedidoConsultaNFePeriodo',
+            '',
+            $this->algorithm,
+            $this->canonical
+        );
 
         $this->isValid($this->urlVersion, $request, 'PedidoConsultaNFePeriodo');
 
@@ -125,27 +130,26 @@ class Tools extends ToolsCommon{
         ];
         //este webservice não requer cabeçalho
         $this->objHeader = null;
-        
+
         $this->lastResponse = $this->sendRequest($body, $parameters);
 
         return $this->lastResponse;
-
     }
 
-    
+
     /**
      * Serviço Consulta NFE
      * de interesse do remetente
      * @param stdClass $data {InscricaoPrestador:'', cnpj: '', NumeroRPS: '', SerieRPS: '', NumeroNFe: ''}
      * @return string
-    */
+     */
     public function ConsultaNFe(
         \stdClass $data
     ) {
 
-		$servico = 'ConsultaNFe';
+        $servico = 'ConsultaNFe';
 
-		$this->servico(
+        $this->servico(
             $servico,
             'SP',
             $this->tpAmb,
@@ -157,13 +161,13 @@ class Tools extends ToolsCommon{
         $consulta = $makeXML->GenerateXMLConsultaNFe($data->cnpj, $data->InscricaoPrestador, $data->NumeroRPS, $data->SerieRPS, $data->NumeroNFe);
 
         $request = Signer::sign(
-                $this->certificate,
-                $consulta,
-                'PedidoConsultaNFe',
-                '',
-                $this->algorithm,
-                $this->canonical
-            );
+            $this->certificate,
+            $consulta,
+            'PedidoConsultaNFe',
+            '',
+            $this->algorithm,
+            $this->canonical
+        );
 
         $this->isValid($this->urlVersion, $request, 'PedidoConsultaNFe');
 
@@ -174,26 +178,25 @@ class Tools extends ToolsCommon{
         ];
         //este webservice não requer cabeçalho
         $this->objHeader = null;
-        
+
         $this->lastResponse = $this->sendRequest($body, $parameters);
 
         $this->lastResponse = $this->removeStuffs($this->lastResponse);
 
         return $this->lastResponse;
-
     }
 
-     /**
+    /**
      * Serviço Cancelar NFE
      * @return string
-    */
+     */
     public function CancelaNfse(
         \stdClass $data
     ) {
 
-		$servico = 'CancelamentoNFe';
+        $servico = 'CancelamentoNFe';
 
-		$this->servico(
+        $this->servico(
             $servico,
             'SP',
             $this->tpAmb,
@@ -213,14 +216,14 @@ class Tools extends ToolsCommon{
         );
 
         $request = Signer::sign(
-                $this->certificate,
-                $request,
-                'PedidoCancelamentoNFe',
-                '',
-                $this->algorithm,
-                $this->canonical
-            );
-        
+            $this->certificate,
+            $request,
+            'PedidoCancelamentoNFe',
+            '',
+            $this->algorithm,
+            $this->canonical
+        );
+
         $this->isValid($this->urlVersion, $request, 'PedidoCancelamentoNFe');
 
         $body = $this->makeBody('CancelamentoNFe', $request);
@@ -231,15 +234,11 @@ class Tools extends ToolsCommon{
 
         //este webservice não requer cabeçalho
         $this->objHeader = null;
-        
+
         $this->lastResponse = $this->sendRequest($body, $parameters);
 
         $this->lastResponse = $this->removeStuffs($this->lastResponse);
 
         return $this->lastResponse;
-
     }
-
 }
-
-?>
