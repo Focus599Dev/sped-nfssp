@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace NFePHP\NFs\SP\Common;
 
@@ -27,9 +27,10 @@ use NFePHP\Common\Signer;
 use NFePHP\Common\Validator;
 use NFePHP\NFs\SP\Common\EntitiesCharacters;
 
-class Tools {
+class Tools
+{
 
-	/**
+    /**
      * config class
      * @var \stdClass
      */
@@ -38,7 +39,7 @@ class Tools {
     /**
      * Path to storage folder
      * @var string
-    */
+     */
     public $pathwsfiles = '';
 
     /**
@@ -56,20 +57,20 @@ class Tools {
     /**
      * Environment
      * @var int
-    */
+     */
     public $tpAmb = 2;
 
     /**
      * soap class
      * @var SoapInterface
-    */
-   
+     */
+
     public $soap;
 
     /**
      * Application version
      * @var string
-    */
+     */
     public $verAplic = '';
 
     /**
@@ -96,13 +97,13 @@ class Tools {
      * Canonical conversion options
      * @var array
      */
-    protected $canonical = [true,false,null,null];
+    protected $canonical = [true, false, null, null];
 
     /**
      * Version of layout
      * @var string
-    */
-    protected $versao = '1';
+     */
+    protected $versao = '2';
 
     /**
      * urlPortal
@@ -159,7 +160,7 @@ class Tools {
      * @var array
      */
     protected $availableVersions = [
-        '1' => 'PL_NFSe_1',
+        '1' => 'PL_NFSe_2',
     ];
 
     /**
@@ -178,28 +179,30 @@ class Tools {
      * and instanciate Contingency::class
      * @param string $configJson content of config in json format
      * @param Certificate $certificate
-    */
-    public function __construct($configJson, Certificate $certificate){
+     */
+    public function __construct($configJson, Certificate $certificate)
+    {
         $this->pathwsfiles = realpath(
             __DIR__ . '/../../config'
-        ).'/';
+        ) . '/';
 
         //valid config json string
         $this->config = json_decode($configJson);
-        
+
         $this->version($this->config->versao);
         $this->setEnvironmentTimeZone($this->config->siglaUF);
         $this->certificate = $certificate;
         $this->setEnvironment($this->config->tpAmb);
         $this->soap = new SoapCurl($certificate);
 
-        if ($this->config->proxy){
+        if ($this->config->proxy) {
             $this->soap->proxy($this->config->proxy, $this->config->proxyPort, $this->config->proxyUser, $this->config->proxyPass);
         }
     }
 
-    public function version($version = null){
-        
+    public function version($version = null)
+    {
+
         if (null === $version) {
             return $this->versao;
         }
@@ -208,13 +211,13 @@ class Tools {
         if (false === isset($this->availableVersions[$version])) {
             throw new \InvalidArgumentException('Essa versão de layout não está disponível');
         }
-        
+
         $this->versao = $version;
         $this->config->schemes = $this->availableVersions[$version];
         $this->pathschemes = realpath(
-            __DIR__ . '/../../schemes/'. $this->config->schemes
-        ).'/';
-        
+            __DIR__ . '/../../schemes/' . $this->config->schemes
+        ) . '/';
+
         return $this->versao;
     }
 
@@ -222,8 +225,9 @@ class Tools {
      * Sets environment time zone
      * @param string $acronym (ou seja a sigla do estado)
      * @return void
-    */
-    public function setEnvironmentTimeZone($acronym){
+     */
+    public function setEnvironmentTimeZone($acronym)
+    {
         date_default_timezone_set(TimeZoneByUF::get($acronym));
     }
 
@@ -231,8 +235,9 @@ class Tools {
      * Alter environment from "homologacao" to "producao" and vice-versa
      * @param int $tpAmb
      * @return void
-    */
-    public function setEnvironment($tpAmb = 2){
+     */
+    public function setEnvironment($tpAmb = 2)
+    {
         if (!empty($tpAmb) && ($tpAmb == 1 || $tpAmb == 2)) {
             $this->tpAmb = $tpAmb;
             $this->ambiente = ($tpAmb == 1) ? 'producao' : 'homologacao';
@@ -242,11 +247,12 @@ class Tools {
     /**
      * Recover path to xml data base with list of soap services
      * @return string
-    */
-    protected function getXmlUrlPath(){
+     */
+    protected function getXmlUrlPath()
+    {
         $file = $this->pathwsfiles
-            . "wsnfse_".$this->versao.".xml";
-        
+            . "wsnfse_" . $this->versao . ".xml";
+
         if (! file_exists($file)) {
             return '';
         }
@@ -258,8 +264,9 @@ class Tools {
      * @param array $parameters
      * @param string $request
      * @return string
-    */
-    protected function sendRequest($request, array $parameters = []){
+     */
+    protected function sendRequest($request, array $parameters = [])
+    {
         $this->checkSoap();
 
         return (string) $this->soap->send(
@@ -276,8 +283,9 @@ class Tools {
 
     /**
      * Verify if SOAP class is loaded, if not, force load SoapCurl
-    */
-    protected function checkSoap(){
+     */
+    protected function checkSoap()
+    {
         if (empty($this->soap)) {
             $this->soap = new SoapCurl($this->certificate);
         }
@@ -291,10 +299,11 @@ class Tools {
      * @param string $body
      * @param string $method
      * @return boolean
-    */
-    protected function isValid($version, $body, $method){
-        
-        $schema = $this->pathschemes.$method."_v$version.xsd";
+     */
+    protected function isValid($version, $body, $method)
+    {
+
+        $schema = $this->pathschemes . $method . "_v$version.xsd";
 
         if (!is_file($schema)) {
             return true;
@@ -304,7 +313,6 @@ class Tools {
             $body,
             $schema
         );
-
     }
 
     /**
@@ -325,39 +333,39 @@ class Tools {
         $ambiente = $tpAmb == 1 ? "producao" : "homologacao";
         $webs = new Webservices($this->getXmlUrlPath());
         $sigla = $uf;
-       
+
         $stdServ = $webs->get($sigla, $ambiente, $this->modelo);
 
         if ($stdServ === false) {
             throw new \RuntimeException(
                 "Nenhum serviço foi localizado para esta unidade "
-                . "da federação [$sigla], com o modelo [$this->modelo]."
+                    . "da federação [$sigla], com o modelo [$this->modelo]."
             );
         }
         if (empty($stdServ->$service->url)) {
             throw new \RuntimeException(
                 "Este serviço [$service] não está disponivel para esta "
-                . "unidade da federação [$uf] ou para este modelo de Nota ["
-                . $this->modelo
-                ."]."
+                    . "unidade da federação [$uf] ou para este modelo de Nota ["
+                    . $this->modelo
+                    . "]."
             );
         }
 
         //recuperação do cUF
         $this->urlcUF = $this->getcUF($uf);
-        
+
         //recuperação da versão
         $this->urlVersion = $stdServ->$service->version;
-        
+
         //recuperação da url do serviço
         $this->urlService = $stdServ->$service->url;
-        
+
         //recuperação do método
         $this->urlMethod = $stdServ->$service->method;
-        
+
         //recuperação da operação
         $this->urlOperation = $stdServ->$service->operation;
-        
+
         //montagem do namespace do serviço
         $this->urlNamespace = $this->urlPortal;
 
@@ -396,7 +404,8 @@ class Tools {
      * @param string $acronym Sigla do estado
      * @return int number cUF
      */
-    public function getcUF($acronym){
+    public function getcUF($acronym)
+    {
         return UFlist::getCodeByUF($acronym);
     }
 
@@ -405,10 +414,10 @@ class Tools {
      * @param string $message
      * @return string
      */
-    protected function stringTransform($message){
+    protected function stringTransform($message)
+    {
 
         return EntitiesCharacters::unconvert(htmlentities($message, ENT_NOQUOTES));
-        
     }
 
     /**
@@ -422,39 +431,41 @@ class Tools {
         $body = str_replace('<?xml version="1.0" encoding="utf-8"?>', '', $body);
         $body = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $body);
         return $body;
-        
     }
 
-    public function makeBody($method, $mensagemXML){
+    public function makeBody($method, $mensagemXML)
+    {
 
         $mensagemXML = $this->clear($mensagemXML);
 
         $mensagemXML = $this->stringTransform($mensagemXML);
 
         $request = "<VersaoSchema>$this->versao</VersaoSchema><MensagemXML>$mensagemXML</MensagemXML>";
-            
+
         $body = "<" . $method . "Request xmlns=\"$this->urlPortal\">" . $request . "</" . $method . "Request>";
 
         return $body;
     }
 
-    public function getLastRequest(){
+    public function getLastRequest()
+    {
         return $this->lastRequest;
     }
 
-    public function getLastResponse(){
+    public function getLastResponse()
+    {
         return $this->lastResponse;
     }
 
     public function removeStuffs($xml)
-    {   
+    {
 
         $xml = htmlspecialchars_decode($xml);
 
         if (preg_match('/<soap:Body>/', $xml)) {
 
             $tag = '<soap:Body>';
-            
+
             $xml = substr($xml, (strpos($xml, $tag) + strlen($tag)), strlen($xml));
 
             $tag = '</soap:Body>';
@@ -463,9 +474,9 @@ class Tools {
         }
 
         $xml = preg_replace('/(xmlns)="([a-z:\/\.]){0,}"/', '', $xml);
-        
+
         $xml = preg_replace('/(xmlns):([a-z]){1,}="([a-z:\/.0-9A-Z\-]){0,}"/', '', $xml);
-        
+
         $xml = str_replace('Versao="1"', '', $xml);
 
         $xml = $this->clear($xml);
@@ -475,5 +486,3 @@ class Tools {
         return $xml;
     }
 }
-
-?>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace NFePHP\NFs\SP;
 
@@ -21,14 +21,15 @@ use NFePHP\Common\Certificate;
 use NFePHP\Common\DOMImproved as Dom;
 use \stdClass;
 
-class Make{
+class Make
+{
 
-	/**
+    /**
      * @var string
      */
-	public $xml;
+    public $xml;
 
-	/**
+    /**
      * @var \NFePHP\Common\DOMImproved
      */
     public $dom;
@@ -44,32 +45,39 @@ class Make{
 
     /**
      * @var DOMElement
-    */
-	protected $Cabecalho;
+     */
+    protected $Cabecalho;
 
     /**
      * @var DOMElement
-    */
-	protected $ChaveRPS;
+     */
+    protected $ChaveRPS;
 
     /**
      * @var DOMElement
-    */
+     */
     protected $RPS;
 
-     /**
+    /**
+     * @var DOMElement
+     */
+    protected $IBSCBS;
+
+    /**
      * Função construtora cria um objeto DOMDocument
      * que será carregado com o documento fiscal
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->dom = new Dom('1.0', 'UTF-8');
         $this->dom->preserveWhiteSpace = false;
         $this->dom->formatOutput = false;
-    } 
+    }
 
-    public function clearDom(){
+    public function clearDom()
+    {
 
-    	$this->dom = new Dom('1.0', 'UTF-8');
+        $this->dom = new Dom('1.0', 'UTF-8');
         $this->dom->preserveWhiteSpace = false;
         $this->dom->formatOutput = false;
         $this->xml = null;
@@ -77,17 +85,22 @@ class Make{
         return $this->dom;
     }
 
-    public function monta(){
+    public function monta()
+    {
 
         $PedidoEnvioLoteRPS = $this->dom->createElement('PedidoEnvioRPS');
 
         foreach ($this->soapnamespaces as $key => $namespace) {
-            
+
             $PedidoEnvioLoteRPS->setAttribute($key, $namespace);
         }
 
         $this->dom->appChild($PedidoEnvioLoteRPS, $this->Cabecalho, 'Falta tag "Cabecalho"');
-        
+
+        if ($this->IBSCBS) {
+            $this->RPS->appendChild($this->IBSCBS);
+        }
+
         $this->dom->appChild($PedidoEnvioLoteRPS, $this->RPS, 'Falta tag "RPS"');
 
         $this->dom->appendChild($PedidoEnvioLoteRPS);
@@ -97,14 +110,15 @@ class Make{
         return true;
     }
 
-    public function buildCabecalho($std){
+    public function buildCabecalho($std)
+    {
 
-		$possible = [
-			'NumeroLote',
-			'versao',
-			'CpfCnpj',
-			'InscricaoMunicipal',
-			'QuantidadeRps',
+        $possible = [
+            'NumeroLote',
+            'versao',
+            'CpfCnpj',
+            'InscricaoMunicipal',
+            'QuantidadeRps',
             'CpfCnpj',
             'dtInicio',
             'dtFim',
@@ -112,7 +126,7 @@ class Make{
             'ValorTotalDeducoes',
             'transacao',
             'QtdRPS',
-		];
+        ];
 
         $std = $this->equilizeParameters($std, $possible);
 
@@ -124,12 +138,12 @@ class Make{
 
         $CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
 
-    	$this->dom->addChild(
+        $this->dom->addChild(
             $CPFCNPJRemetente,
             "CNPJ",
             Strings::replaceSpecialsChars(trim($std->CpfCnpj)),
             true,
-			"CNPJ"
+            "CNPJ"
         );
 
         $this->dom->appChild($Cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
@@ -185,16 +199,16 @@ class Make{
         $this->Cabecalho = $Cabecalho;
 
         return $Cabecalho;
-
     }
 
-    public function buildChaveRPS($std){
+    public function buildChaveRPS($std)
+    {
 
         $possible = [
-			'InscricaoPrestador',
+            'InscricaoPrestador',
             'SerieRPS',
             'NumeroRPS',
-		];
+        ];
 
         $std = $this->equilizeParameters($std, $possible);
 
@@ -229,10 +243,11 @@ class Make{
         return $ChaveRPS;
     }
 
-    public function buildRPS($std){
+    public function buildRPS($std)
+    {
 
         $possible = [
-			'CpfCnpj',
+            'CpfCnpj',
             'InscricaoMunicipalTomador',
             'InscricaoEstadualTomador',
             'RazaoSocialTomador',
@@ -272,16 +287,28 @@ class Make{
             'NumeroEncapsulamento',
             'ValorTotalRecebido',
             'Discriminacao',
-		];
+            'ValorInicialCobrado',
+            'ValorFinalCobrado',
+            'ValorMulta',
+            'ValorJuros',
+            'ValorIPI',
+            'ExigibilidadeSuspensa',
+            'PagamentoParceladoAntecipado',
+            'NCM',
+            'NBS',
+            'atvEvento',
+            'cLocPrestacao',
+            'cPaisPrestacao'
+        ];
 
         $std = $this->equilizeParameters($std, $possible);
 
         $RPS = $this->dom->createElement('RPS');
 
         $RPS->setAttribute('xmlns', '');
-        
-        $this->dom->appChild($RPS, $this->ChaveRPS , 'Falta tag "ChaveRPS"');
-        
+
+        $this->dom->appChild($RPS, $this->ChaveRPS, 'Falta tag "ChaveRPS"');
+
         $this->dom->addChild(
             $RPS,
             "TipoRPS",
@@ -314,13 +341,13 @@ class Make{
             "Informe o tipo de tributação do RPS."
         );
 
-        $this->dom->addChild(
-            $RPS,
-            "ValorServicos",
-            $std->ValorServicos,
-            true,
-            "Informe o valor dos serviços prestados."
-        );
+        // $this->dom->addChild(
+        //     $RPS,
+        //     "ValorServicos",
+        //     $std->ValorServicos,
+        //     true,
+        //     "Informe o valor dos serviços prestados."
+        // );
 
         $this->dom->addChild(
             $RPS,
@@ -337,7 +364,7 @@ class Make{
             false,
             "Informe o valor da retenção do PIS."
         );
-        
+
         $this->dom->addChild(
             $RPS,
             "ValorCOFINS",
@@ -396,13 +423,12 @@ class Make{
 
         $CPFCNPJTomador = $this->dom->createElement('CPFCNPJTomador');
 
-		if ($std->TaxIDType == 1){
-        
-            $std->CpfCnpj = substr($std->CpfCnpj, -11);
+        if ($std->TaxIDType == 1) {
 
+            $std->CpfCnpj = substr($std->CpfCnpj, -11);
         }
 
-        if ( strlen($std->CpfCnpj) >= 14){
+        if (strlen($std->CpfCnpj) >= 14) {
 
             $this->dom->addChild(
                 $CPFCNPJTomador,
@@ -422,7 +448,7 @@ class Make{
             );
         }
 
-        $this->dom->appChild( $RPS,  $CPFCNPJTomador , 'Falta tag "CPFCNPJTomador"');
+        $this->dom->appChild($RPS,  $CPFCNPJTomador, 'Falta tag "CPFCNPJTomador"');
 
         $this->dom->addChild(
             $RPS,
@@ -448,8 +474,8 @@ class Make{
             "Informe o Nome/Razão Social do tomador. Este campo é obrigatório apenas para tomadores Pessoa Jurídica (CNPJ). Este campo será ignorado caso seja fornecido um CPF/CNPJ ou a Inscrição Municipal do tomador pertença ao município de São Paulo."
         );
 
-        if ($std->TipoLogradouro || $std->Logradouro || $std->NumeroEndereco || $std->ComplementoEndereco || $std->Bairro || $std->Cidade || $std->UF || $std->CEP ){
-    
+        if ($std->TipoLogradouro || $std->Logradouro || $std->NumeroEndereco || $std->ComplementoEndereco || $std->Bairro || $std->Cidade || $std->UF || $std->CEP) {
+
             $EnderecoTomador = $this->dom->createElement('EnderecoTomador');
 
             $this->dom->addChild(
@@ -516,8 +542,7 @@ class Make{
                 "Endereço tomador CEP"
             );
 
-            $this->dom->appChild( $RPS,  $EnderecoTomador , 'Falta tag "CPFCNPJTomador"');
-
+            $this->dom->appChild($RPS,  $EnderecoTomador, 'Falta tag "CPFCNPJTomador"');
         }
 
         $this->dom->addChild(
@@ -528,8 +553,8 @@ class Make{
             "Informe o e-mail do tomador."
         );
 
-        if ($std->CPFCNPJIntermediario){
-           
+        if ($std->CPFCNPJIntermediario) {
+
             $CPFCNPJIntermediario = $this->dom->createElement("CPFCNPJIntermediario");
 
             $this->dom->addChild(
@@ -606,7 +631,7 @@ class Make{
             false,
             "Código do CEI – Cadastro específico do INSS."
         );
-        
+
         $this->dom->addChild(
             $RPS,
             "MatriculaObra",
@@ -639,16 +664,521 @@ class Make{
             "Informe o valor total recebido.."
         );
 
+        if ($std->ValorInicialCobrado) {
+            $this->dom->addChild(
+                $RPS,
+                "ValorInicialCobrado",
+                $std->ValorInicialCobrado,
+                false,
+                "Informe o valor inicial cobrado."
+            );
+        } else if ($std->ValorFinalCobrado) {
+            $this->dom->addChild(
+                $RPS,
+                "ValorFinalCobrado",
+                $std->ValorFinalCobrado,
+                false,
+                "Informe o valor final cobrado."
+            );
+        }
+
+        $this->dom->addChild(
+            $RPS,
+            "ValorMulta",
+            $std->ValorMulta,
+            false,
+            "Valor da multa."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "ValorJuros",
+            $std->ValorJuros,
+            false,
+            "Valor do juros."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "ValorIPI",
+            $std->ValorIPI,
+            true,
+            "Valor do IPI."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "ExigibilidadeSuspensa",
+            $std->ExigibilidadeSuspensa ? 1 : 0,
+            true,
+            "Exigibilidade Suspensa."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "PagamentoParceladoAntecipado",
+            $std->PagamentoParceladoAntecipado ? 1 : 0,
+            true,
+            "Pagamento Parcelado Antecipado."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "NCM",
+            $std->NCM,
+            false,
+            "Informe o número NCM (Nomenclatura Comum do Mercosul)."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "NBS",
+            $std->NBS,
+            true,
+            "Informe o número NBS (Nomenclatura Brasileira de Serviços)."
+        );
+
+        $this->dom->addChild(
+            $RPS,
+            "atvEvento",
+            $std->atvEvento,
+            false,
+            "Informações dos Tipos de evento."
+        );
+
+        if ($std->cLocPrestacao) {
+            $this->dom->addChild(
+                $RPS,
+                "cLocPrestacao",
+                $std->cLocPrestacao,
+                true,
+                "Informações do local de prestação."
+            );
+        } else {
+            $this->dom->addChild(
+                $RPS,
+                "cPaisPrestacao",
+                $std->cPaisPrestacao,
+                true,
+                "Informações do país de prestação."
+            );
+        }
+
         $this->RPS = $RPS;
 
         return $RPS;
-    }   
+    }
+
+    public function buildIBSCBS($std)
+    {
+        $possible = [
+            "finNFSe",
+            "indFinal",
+            "cIndOp",
+            "tpOper",
+            "tpEnteGov",
+            "indDest",
+            "dtEmiDoc",
+            "dtCompDoc"
+        ];
+
+        $std = $this->equilizeParameters($std, $possible);
+
+        $IBSCBS = $this->dom->createElement("IBSCBS");
+
+        $this->dom->addChild(
+            $IBSCBS,
+            "finNFSe",
+            $std->finNFSe,
+            true,
+            "Finalidade da NFSe."
+        );
+
+        $this->dom->addChild(
+            $IBSCBS,
+            "indFinal",
+            $std->indFinal,
+            true,
+            "Indicador de finalidade da NFSe."
+        );
+
+        $this->dom->addChild(
+            $IBSCBS,
+            "cIndOp",
+            $std->cIndOp,
+            true,
+            "Código do Indicador de Operação."
+        );
+
+        $this->dom->addChild(
+            $IBSCBS,
+            "tpOper",
+            $std->tpOper,
+            false,
+            "Tipo de Operação."
+        );
+
+        if (isset($std->refNFSe) && count($std->refNFSe)) {
+
+            $gRefNFSe = $this->dom->createElement("gRefNFSe");
+
+            foreach ($std->refNFSe as $refNFSe) {
+
+                $refNFSe = $this->dom->createElement("refNFSe");
+
+                $refNFSe->nodeValue = $refNFSe;
+
+                $gRefNFSe->appendChild($refNFSe);
+            }
+
+            $IBSCBS->appendChild($gRefNFSe);
+        }
+
+        $this->dom->addChild(
+            $IBSCBS,
+            "tpEnteGov",
+            $std->tpEnteGov,
+            false,
+            "Tipo de Ente Governamental."
+        );
+
+        $this->dom->addChild(
+            $IBSCBS,
+            "indDest",
+            $std->indDest,
+            true,
+            "Indicador de destino."
+        );
+
+        if (isset($this->IBSCBS->dest)) {
+            $possible = [
+                'xNome',
+                'CPF',
+                'CNPJ',
+                'NIF',
+                'NaoNIF',
+                'end',
+                'email'
+            ];
+
+            $std = $this->equilizeParameters($std, $possible);
+
+            $dest = $this->dom->createElement("dest");
+
+            if ($std->CPF) {
+                $this->dom->addChild(
+                    $dest,
+                    "CPF",
+                    $std->CPF,
+                    true,
+                    "CPF do destinatário."
+                );
+            } else if ($std->CNPJ) {
+                $this->dom->addChild(
+                    $dest,
+                    "CNPJ",
+                    $std->CNPJ,
+                    true,
+                    "CNPJ do destinatário."
+                );
+            } else if ($std->NIF) {
+                $this->dom->addChild(
+                    $dest,
+                    "NIF",
+                    $std->NIF,
+                    true,
+                    "NIF do destinatário."
+                );
+            } else if ($std->NaoNIF) {
+                $this->dom->addChild(
+                    $dest,
+                    "NaoNIF",
+                    $std->NaoNIF,
+                    true,
+                    "NaoNIF do destinatário."
+                );
+            }
+
+            $this->dom->addChild(
+                $dest,
+                "xNome",
+                $std->xNome,
+                true,
+                "Nome do destinatário."
+            );
+
+            $this->dom->addChild(
+                $dest,
+                "end",
+                $std->end,
+                false,
+                "Endereço do destinatário."
+            );
+
+            $this->dom->addChild(\
+                $dest,
+                "email",
+                $std->email,
+                false,
+                "Email do destinatário."
+            );
+
+            $IBSCBS->appendChild($dest);
+        }
+
+        $valores = $this->dom->createElement("valores");
+
+        if (isset($std->documentos) && count($std->documentos)) {
+            $gReeRepRes = $this->dom->createElement("gReeRepRes");
+
+            foreach ($std->documentos as $documento) {
+                $documentos = $this->dom->createElement("documentos");
+
+                $possible = [
+                    "dFeNacional",
+                    "docFiscalOutro",
+                    "docOutro",
+                    "dtEmiDoc",
+                    "dtCompDoc",
+                    "tpReeRepRes",
+                    "xTpReeRepRes",
+                    "vlrReeRepRes"
+                ];
+
+                $documento = $this->equilizeParameters($documento, $possible);
+
+                $this->dom->addChild(
+                    $documentos,
+                    "dFeNacional",
+                    $documento->dFeNacional,
+                    true,
+                    "Data de emissão da NFSe nacional."
+                );
+
+                $this->dom->addChild(
+                    $documentos,
+                    "docFiscalOutro",
+                    $documento->docFiscalOutro,
+                    true,
+                    "Documento fiscal de outro estado."
+                );
+
+                $this->dom->addChild(
+                    $documentos,
+                    "docOutro",
+                    $documento->docOutro,
+                    true,
+                    "Documento fiscal de outro estado."
+                );
+
+                if (isset($documento->fornec)) {
+                    $possible = [
+                        "CPF",
+                        "CNPJ",
+                        "NIF",
+                        "NaoNIF",
+                        "xNome",
+                    ];
+
+                    $documento->fornec = $this->equilizeParameters($documento, $possible);
+
+                    $fornec = $this->dom->createElement("fornec");
+
+                    if ($documento->CPF) {
+                        $this->dom->addChild(
+                            $fornec,
+                            "CPF",
+                            $documento->CPF,
+                            true,
+                            "CPF do fornecedor."
+                        );
+                    } else if ($documento->CNPJ) {
+                        $this->dom->addChild(
+                            $fornec,
+                            "CNPJ",
+                            $documento->CNPJ,
+                            true,
+                            "CNPJ do fornecedor."
+                        );
+                    } else if ($documento->NIF) {
+                        $this->dom->addChild(
+                            $fornec,
+                            "NIF",
+                            $documento->NIF,
+                            true,
+                            "NIF do fornecedor."
+                        );
+                    } else if ($documento->NaoNIF) {
+                        $this->dom->addChild(
+                            $fornec,
+                            "NaoNIF",
+                            $documento->NaoNIF,
+                            true,
+                            "NaoNIF do fornecedor."
+                        );
+                    }
+
+                    $this->dom->addChild(
+                        $fornec,
+                        "xNome",
+                        $documento->xNome,
+                        true,
+                        "Nome do fornecedor."
+                    );
+
+                    $documentos->appendChild($fornec);
+
+                }
+
+                $this->dom->addChild(
+                    $documentos,
+                    "dtEmiDoc",
+                    $documento->dtEmiDoc,
+                    true,
+                    "Data de emissão do documento."
+                );
+
+                $this->dom->addChild(
+                    $documentos,
+                    "dtCompDoc",
+                    $documento->dtCompDoc,
+                    true,
+                    "Data de compo."
+                );
+
+                $this->dom->addChild(
+                    $documentos,
+                    "tpReeRepRes",
+                    $documento->tpReeRepRes,
+                    true,
+                    "Tipo de ree."
+                );
+
+                $this->dom->addChild(
+                    $documentos,
+                    "xTpReeRepRes",
+                    $documento->xTpReeRepRes,
+                    false,
+                    "Tipo de ree."
+                );
+
+                $this->dom->addChild(
+                    $documentos,
+                    "vlrReeRepRes",
+                    $documento->vlrReeRepRes,
+                    true,
+                    "Valor do ree."
+                );
+                
+                $gReeRepRes->appendChild($documentos);
+            }
+
+            $valores->appendChild($gReeRepRes);
+        }
+
+        $trib = $this->dom->createElement("trib");
+
+        if (isset($std->trib)){
+
+            $possible = [
+                "cClassTrib",
+                "cClassTribReg",
+            ];
+
+            $std->trib = $this->equilizeParameters($std->trib, $possible);
+
+            $trib = $this->dom->createElement("trib");
+
+            $gIBSCBS = $this->dom->createElement("gIBSCBS");
+
+            $gTribRegular = $this->dom->createElement("gTribRegular");
+            
+            $this->dom->addChild(
+                $gIBSCBS,
+                "cClassTrib",
+                $std->trib->cClassTrib,
+                true,
+                "Código de classificação tributária."
+            );
+
+            $this->dom->addChild(
+                $gTribRegular,
+                "cClassTribReg",
+                $std->trib->cClassTribReg,
+                true,
+                "Código de classificação tributária."
+            );
+
+            $gIBSCBS->appendChild($gTribRegular);
+
+            $trib->appendChild($gIBSCBS);
+
+            $valores->appendChild($trib);
+        }
+
+        $IBSCBS->appendChild($valores);
+
+        if (isset($std->imovelobra)){
+
+            $imovelobra = $this->dom->createElement("imovelobra");
+
+            $possible = [
+                "inscImobFisc",
+                "cCIB",
+                "cObra",
+                "end",
+            ];
+
+            $std->imovelobra = $this->equilizeParameters($std->imovelobra, $possible);
+
+            $this->dom->addChild(
+                $imovelobra,
+                "inscImobFisc",
+                $std->imovelobra->inscImobFisc,
+                false,
+                "Inscrição imobiliária fiscal."
+            );
+
+            if ($std->imovelobra->cCIB) {   
+                $this->dom->addChild(
+                    $imovelobra,
+                    "cCIB",
+                    $std->imovelobra->cCIB,
+                    false,
+                    "Código de classificação tributária."
+                );
+            } else if ($std->imovelobra->cObra) {
+                $this->dom->addChild(
+                    $imovelobra,
+                    "cObra",
+                    $std->imovelobra->cObra,
+                    false,
+                    "Código de classificação tributária."
+                );   
+            } else if ($std->imovelobra->end) {
+                $this->dom->addChild(
+                    $imovelobra,
+                    "end",
+                    $std->imovelobra->end,
+                    false,
+                    "Código de classificação tributária."
+                );   
+            }
+
+            $IBSCBS->appendChild($imovelobra);
+        }
+
+        $this->IBSCBS = $IBSCBS;
+
+        return $IBSCBS;
+    }
 
     /**
      * Returns xml string and assembly it is necessary
      * @return string
-    */
-    public function getXML(){
+     */
+    public function getXML()
+    {
         if (empty($this->xml)) {
             $this->monta();
         }
@@ -656,8 +1186,9 @@ class Make{
         return $this->xml;
     }
 
-    public function setVersion($version){
-    	$this->version = $version;
+    public function setVersion($version)
+    {
+        $this->version = $version;
     }
 
     /**
@@ -665,9 +1196,10 @@ class Make{
      * @param stdClass $std
      * @param array $possible
      * @return stdClass
-    */
-    protected function equilizeParameters(stdClass $std, $possible){
-        
+     */
+    protected function equilizeParameters(stdClass $std, $possible)
+    {
+
         $arr = get_object_vars($std);
 
         foreach ($possible as $key) {
@@ -675,26 +1207,25 @@ class Make{
             if (!array_key_exists($key, $arr)) {
 
                 $std->$key = null;
-
             }
-
         }
 
         return $std;
     }
 
-    public function GenerateXMLCancelarNFe($cnpj, $InscricaoPrestador, $NumeroRPS, $NumeroNFe){
-        
+    public function GenerateXMLCancelarNFe($cnpj, $InscricaoPrestador, $NumeroRPS, $NumeroNFe)
+    {
+
         $PedidoCancelamentoNFe = $this->dom->createElement("PedidoCancelamentoNFe");
 
-    	$PedidoCancelamentoNFe->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
+        $PedidoCancelamentoNFe->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
 
         $cabecalho = $this->dom->createElement('Cabecalho');
 
-    	$cabecalho->setAttribute('Versao', $this->version);
-    	
-    	$cabecalho->setAttribute('xmlns', '');
-        
+        $cabecalho->setAttribute('Versao', $this->version);
+
+        $cabecalho->setAttribute('xmlns', '');
+
         $CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
 
         $this->dom->addChild(
@@ -702,33 +1233,33 @@ class Make{
             "CNPJ",
             Strings::replaceSpecialsChars(trim($cnpj)),
             true,
-			"CNPJ"
+            "CNPJ"
         );
 
         $this->dom->appChild($cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
-        
+
         $this->dom->addChild(
             $cabecalho,
             "transacao",
             'true',
             true,
-			"transacao"
+            "transacao"
         );
 
-        $this->dom->appChild($PedidoCancelamentoNFe, $cabecalho, 'Falta tag "Detalhe"');   
+        $this->dom->appChild($PedidoCancelamentoNFe, $cabecalho, 'Falta tag "Detalhe"');
 
         $detalhe = $this->dom->createElement('Detalhe');
 
-    	$detalhe->setAttribute('xmlns', '');
+        $detalhe->setAttribute('xmlns', '');
 
-    	$ChaveNFe = $this->dom->createElement('ChaveNFe');
+        $ChaveNFe = $this->dom->createElement('ChaveNFe');
 
         $this->dom->addChild(
             $ChaveNFe,
             "InscricaoPrestador",
             Strings::replaceSpecialsChars(trim($InscricaoPrestador)),
             true,
-			"InscricaoPrestador"
+            "InscricaoPrestador"
         );
 
         $this->dom->addChild(
@@ -736,58 +1267,59 @@ class Make{
             "NumeroNFe",
             $NumeroNFe,
             true,
-			"NumeroNFe"
+            "NumeroNFe"
         );
 
-        $this->dom->appChild($detalhe, $ChaveNFe, 'Falta tag "Detalhe"');   
-        
-        $this->dom->appChild($PedidoCancelamentoNFe, $detalhe, 'Falta tag "Detalhe"');   
-        
+        $this->dom->appChild($detalhe, $ChaveNFe, 'Falta tag "Detalhe"');
+
+        $this->dom->appChild($PedidoCancelamentoNFe, $detalhe, 'Falta tag "Detalhe"');
+
         $this->dom->appendChild($PedidoCancelamentoNFe);
 
         return $this->dom->saveXML();
     }
 
-    public function GenerateXMLConsultaNFe($cnpj = '', $InscricaoPrestador = '', $NumeroRPS = '', $SerieRPS = '', $NumeroNFe = ''){
+    public function GenerateXMLConsultaNFe($cnpj = '', $InscricaoPrestador = '', $NumeroRPS = '', $SerieRPS = '', $NumeroNFe = '')
+    {
 
         $PedidoConsultaNFe = $this->dom->createElement("PedidoConsultaNFe");
 
-    	$PedidoConsultaNFe->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
+        $PedidoConsultaNFe->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
 
-    	$cabecalho = $this->dom->createElement('Cabecalho');
+        $cabecalho = $this->dom->createElement('Cabecalho');
 
-    	$cabecalho->setAttribute('Versao', $this->version);
-    	
-    	$cabecalho->setAttribute('xmlns', '');
+        $cabecalho->setAttribute('Versao', $this->version);
 
-    	$CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
+        $cabecalho->setAttribute('xmlns', '');
+
+        $CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
 
         $this->dom->addChild(
             $CPFCNPJRemetente,
             "CNPJ",
             Strings::replaceSpecialsChars(trim($cnpj)),
             true,
-			"CNPJ"
+            "CNPJ"
         );
 
-        $this->dom->appChild($cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');   
+        $this->dom->appChild($cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
 
-        $this->dom->appChild($PedidoConsultaNFe, $cabecalho, 'Falta tag "Detalhe"');   
+        $this->dom->appChild($PedidoConsultaNFe, $cabecalho, 'Falta tag "Detalhe"');
 
-    	$detalhe = $this->dom->createElement('Detalhe');
+        $detalhe = $this->dom->createElement('Detalhe');
 
-    	$detalhe->setAttribute('xmlns', '');
+        $detalhe->setAttribute('xmlns', '');
 
-    	$ChaveRPS = $this->dom->createElement('ChaveRPS');
+        $ChaveRPS = $this->dom->createElement('ChaveRPS');
 
-    	// $ChaveNFe = $this->dom->createElement('ChaveNFe');
+        // $ChaveNFe = $this->dom->createElement('ChaveNFe');
 
         $this->dom->addChild(
             $ChaveRPS,
             "InscricaoPrestador",
             Strings::replaceSpecialsChars(trim($InscricaoPrestador)),
             true,
-			"InscricaoPrestador"
+            "InscricaoPrestador"
         );
 
         $this->dom->addChild(
@@ -795,7 +1327,7 @@ class Make{
             "SerieRPS",
             Strings::replaceSpecialsChars(trim($SerieRPS)),
             true,
-			"SerieRPS"
+            "SerieRPS"
         );
 
         $this->dom->addChild(
@@ -803,17 +1335,17 @@ class Make{
             "NumeroRPS",
             $NumeroRPS,
             true,
-			"NumeroRPS"
+            "NumeroRPS"
         );
 
-        $this->dom->appChild($detalhe, $ChaveRPS, 'Falta tag "Detalhe"');   
+        $this->dom->appChild($detalhe, $ChaveRPS, 'Falta tag "Detalhe"');
 
         // $this->dom->addChild(
         //     $ChaveNFe,
         //     "InscricaoPrestador",
         //     Strings::replaceSpecialsChars(trim($InscricaoPrestador)),
         //     true,
-		// 	"InscricaoPrestador"
+        // 	"InscricaoPrestador"
         // );
 
         // $this->dom->addChild(
@@ -821,53 +1353,53 @@ class Make{
         //     "NumeroNFe",
         //     $NumeroNFe,
         //     true,
-		// 	"NumeroNFe"
+        // 	"NumeroNFe"
         // );
 
         // $this->dom->appChild($detalhe, $ChaveNFe, 'Falta tag "Detalhe"');   
-       
-        $this->dom->appChild($PedidoConsultaNFe, $detalhe, 'Falta tag "Detalhe"');   
+
+        $this->dom->appChild($PedidoConsultaNFe, $detalhe, 'Falta tag "Detalhe"');
 
         $this->dom->appendChild($PedidoConsultaNFe);
 
         return $this->dom->saveXML();
-
     }
 
-    public function GenerateXMLPedidoConsultaNFePeriodo($CPFCNPJRemetS,$CPFCNPJS,$dateIni,$dateEnd,$inscricao = '',$page = 1){
+    public function GenerateXMLPedidoConsultaNFePeriodo($CPFCNPJRemetS, $CPFCNPJS, $dateIni, $dateEnd, $inscricao = '', $page = 1)
+    {
 
-    	$PedidoConsultaNFePeriodo = $this->dom->createElement("PedidoConsultaNFePeriodo");
+        $PedidoConsultaNFePeriodo = $this->dom->createElement("PedidoConsultaNFePeriodo");
 
-    	$PedidoConsultaNFePeriodo->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
+        $PedidoConsultaNFePeriodo->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
 
-    	$cabecalho = $this->dom->createElement('Cabecalho');
+        $cabecalho = $this->dom->createElement('Cabecalho');
 
-    	$cabecalho->setAttribute('Versao', $this->version);
-    	
-    	$cabecalho->setAttribute('xmlns', '');
+        $cabecalho->setAttribute('Versao', $this->version);
 
-    	$CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
+        $cabecalho->setAttribute('xmlns', '');
 
-    	$this->dom->addChild(
+        $CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
+
+        $this->dom->addChild(
             $CPFCNPJRemetente,
             "CNPJ",
             Strings::replaceSpecialsChars(trim($CPFCNPJRemetS)),
             true,
-			"CNPJ"
+            "CNPJ"
         );
 
         $this->dom->appChild($cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
 
 
-    	$CPFCNPJ = $this->dom->createElement("CPFCNPJ");
+        $CPFCNPJ = $this->dom->createElement("CPFCNPJ");
 
-    	$this->dom->addChild(
+        $this->dom->addChild(
             $CPFCNPJ,
             "CNPJ",
             Strings::replaceSpecialsChars(trim($CPFCNPJS)),
             true,
-			"CNPJ"
-        );        
+            "CNPJ"
+        );
 
         $this->dom->appChild($cabecalho, $CPFCNPJ, 'Falta tag "Cabecalho"');
 
@@ -876,7 +1408,7 @@ class Make{
             "Inscricao",
             Strings::replaceSpecialsChars(trim($inscricao)),
             false,
-			"Inscricao"
+            "Inscricao"
         );
 
         $this->dom->addChild(
@@ -884,15 +1416,15 @@ class Make{
             "dtInicio",
             Strings::replaceSpecialsChars(trim($dateIni)),
             true,
-			"data Inicio"
-        );                
+            "data Inicio"
+        );
 
         $this->dom->addChild(
             $cabecalho,
             "dtFim",
             Strings::replaceSpecialsChars(trim($dateEnd)),
             true,
-			"data fim"
+            "data fim"
         );
 
         $this->dom->addChild(
@@ -900,7 +1432,7 @@ class Make{
             "NumeroPagina",
             Strings::replaceSpecialsChars(trim($page)),
             true,
-			"Numero pagina"
+            "Numero pagina"
         );
 
         $this->dom->appChild($PedidoConsultaNFePeriodo, $cabecalho, 'Falta tag "Cabecalho"');
@@ -908,13 +1440,11 @@ class Make{
         $this->dom->appendChild($PedidoConsultaNFePeriodo);
 
         return $this->dom->saveXML();
-
     }
 
-    private function removePointAndComa($text){
+    private function removePointAndComa($text)
+    {
 
         return preg_replace('/(-|,|\.)/', '', $text);
     }
 }
-
-?>
