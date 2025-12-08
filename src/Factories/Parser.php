@@ -175,6 +175,7 @@ class Parser
      */
     private function aEntity($std)
     {
+        $this->make->setVersion($std->versao);
 
         $this->cabecalho = $std;
     }
@@ -258,7 +259,7 @@ class Parser
 
     /**
      * tag IBSCBS
-     * I|finNFSe|indFinal|cIndOp|tpOper|tpEnteGov|indDest|dtEmiDoc|dtCompDoc|
+     * I|finNFSe|indFinal|cIndOp|tpOper|tpEnteGov|indDest
      * @param stdClass $std
      * @return void
      */

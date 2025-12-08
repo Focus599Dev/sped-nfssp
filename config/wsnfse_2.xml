@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WS xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <UF>
+        <sigla>SP</sigla>
+        <homologacao>
+            <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</PedidoConsultaNFePeriodo>
+            <EnvioLoteRPS method='EnvioLoteRpsAsync' operation='envioLoteRpsAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</EnvioLoteRPS>
+            <TesteEnvioLoteRPS method='testeEnvioLoteRPSAsync' operation='testeEnvioLoteRPSAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</TesteEnvioLoteRPS>
+            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</ConsultaNFe>
+            <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</CancelamentoNFe>
+        </homologacao>
+        <producao>
+            <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</PedidoConsultaNFePeriodo>
+            <EnvioLoteRPS method='EnvioLoteRpsAsync' operation='envioLoteRpsAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</EnvioLoteRPS>
+            <TesteEnvioLoteRPS method='testeEnvioLoteRPSAsync' operation='testeEnvioLoteRPSAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</TesteEnvioLoteRPS>
+            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</ConsultaNFe>
+            <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</CancelamentoNFe>
+        </producao>
+    </UF>
+</WS>

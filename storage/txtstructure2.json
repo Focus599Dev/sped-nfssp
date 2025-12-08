@@ -7,7 +7,7 @@
     "H": "H|InscricaoPrestador|SerieRPS|NumeroRPS|",
     "H01": "H01|TipoRPS|DataEmissao|StatusRPS|TributacaoRPS|ValorServicos|ValorDeducoes|ValorPIS|ValorCOFINS|ValorINSS|ValorIR|ValorCSLL|CodigoServico|AliquotaServicos|ISSRetido|CPFCNPJIntermediario|InscricaoMunicipalIntermediario|ISSRetidoIntermediario|EmailIntermediario|ValorCargaTributaria|PercentualCargaTributaria|FonteCargaTributaria|CodigoCEI|MatriculaObra|MunicipioPrestacao|NumeroEncapsulamento|ValorTotalRecebido|ValorInicialCobrado|ValorFinalCobrado|ValorMulta|ValorJuros|ValorIPI|ExigibilidadeSuspensa|PagamentoParceladoAntecipado|NCM|NBS|atvEvento|cLocPrestacao|cPaisPrestacao|",
     "H02": "H02|Discriminacao|",
-    "I": "I|finNFSe|indFinal|cIndOp|tpOper|tpEnteGov|indDest|dtEmiDoc|dtCompDoc|",
+    "I": "I|finNFSe|indFinal|cIndOp|tpOper|tpEnteGov|indDest|",
     "I01": "I01|refNFSe|",
     "I02": "I02|xNome|end|email|",
     "I02A": "I02A|CPF",

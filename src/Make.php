@@ -88,7 +88,7 @@ class Make
     public function monta()
     {
 
-        $PedidoEnvioLoteRPS = $this->dom->createElement('PedidoEnvioRPS');
+        $PedidoEnvioLoteRPS = $this->dom->createElement('PedidoEnvioLoteRPS');
 
         foreach ($this->soapnamespaces as $key => $namespace) {
 
@@ -148,53 +148,37 @@ class Make
 
         $this->dom->appChild($Cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
 
-        // $this->dom->addChild(
-        //     $Cabecalho,
-        //     "transacao",
-        //     $std->transacao,
-        //     false,
-        //     "Informe se os RPS a serem substituídos por NFS-e farão parte de uma mesma transação. True - Os RPS só serão substituídos por NFS-e se não ocorrer nenhum evento de erro durante o processamento de todo o lote; False - Os RPS válidos serão substituídos por NFS-e, mesmo que ocorram eventos de erro durante processamento de outros RPS deste lote."
-        // );
+        $this->dom->addChild(
+            $Cabecalho,
+            "transacao",
+            $std->transacao,
+            false,
+            "Informe se os RPS a serem substituídos por NFS-e farão parte de uma mesma transação. True - Os RPS só serão substituídos por NFS-e se não ocorrer nenhum evento de erro durante o processamento de todo o lote; False - Os RPS válidos serão substituídos por NFS-e, mesmo que ocorram eventos de erro durante processamento de outros RPS deste lote."
+        );
 
-        // $this->dom->addChild(
-        //     $Cabecalho,
-        //     "dtInicio",
-        //     $std->dtInicio,
-        //     true,
-        //     "Informe a data de início do período transmitido (AAAA-MM-DD)."
-        // );
+        $this->dom->addChild(
+            $Cabecalho,
+            "dtInicio",
+            $std->dtInicio,
+            true,
+            "Informe a data de início do período transmitido (AAAA-MM-DD)."
+        );
 
-        // $this->dom->addChild(
-        //     $Cabecalho,
-        //     "dtFim",
-        //     $std->dtFim,
-        //     true,
-        //     "Informe a data final do período transmitido (AAAA-MM-DD)."
-        // );
+        $this->dom->addChild(
+            $Cabecalho,
+            "dtFim",
+            $std->dtFim,
+            true,
+            "Informe a data final do período transmitido (AAAA-MM-DD)."
+        );
 
-        // $this->dom->addChild(
-        //     $Cabecalho,
-        //     "QtdRPS",
-        //     $std->QtdRPS,
-        //     true,
-        //     "Informe o total de RPS contidos na mensagem XML."
-        // );
-
-        // $this->dom->addChild(
-        //     $Cabecalho,
-        //     "ValorTotalServicos",
-        //     $std->ValorTotalServicos,
-        //     true,
-        //     "Informe o valor total dos serviços prestados dos RPS contidos na mensagem XML."
-        // );
-
-        // $this->dom->addChild(
-        //     $Cabecalho,
-        //     "ValorTotalDeducoes",
-        //     $std->ValorTotalDeducoes,
-        //     false,
-        //     "Informe o valor total das deduções dos RPS contidos na mensagem XML."
-        // );
+        $this->dom->addChild(
+            $Cabecalho,
+            "QtdRPS",
+            $std->QtdRPS,
+            true,
+            "Informe o total de RPS contidos na mensagem XML."
+        );
 
         $this->Cabecalho = $Cabecalho;
 
@@ -361,7 +345,7 @@ class Make
             $RPS,
             "ValorPIS",
             $std->ValorPIS,
-            false,
+            true,
             "Informe o valor da retenção do PIS."
         );
 
@@ -778,8 +762,6 @@ class Make
             "tpOper",
             "tpEnteGov",
             "indDest",
-            "dtEmiDoc",
-            "dtCompDoc"
         ];
 
         $std = $this->equilizeParameters($std, $possible);
@@ -915,7 +897,7 @@ class Make
                 "Endereço do destinatário."
             );
 
-            $this->dom->addChild(\
+            $this->dom->addChild(
                 $dest,
                 "email",
                 $std->email,
@@ -1027,7 +1009,6 @@ class Make
                     );
 
                     $documentos->appendChild($fornec);
-
                 }
 
                 $this->dom->addChild(
@@ -1069,7 +1050,7 @@ class Make
                     true,
                     "Valor do ree."
                 );
-                
+
                 $gReeRepRes->appendChild($documentos);
             }
 
@@ -1078,7 +1059,7 @@ class Make
 
         $trib = $this->dom->createElement("trib");
 
-        if (isset($std->trib)){
+        if (isset($std->trib)) {
 
             $possible = [
                 "cClassTrib",
@@ -1092,7 +1073,7 @@ class Make
             $gIBSCBS = $this->dom->createElement("gIBSCBS");
 
             $gTribRegular = $this->dom->createElement("gTribRegular");
-            
+
             $this->dom->addChild(
                 $gIBSCBS,
                 "cClassTrib",
@@ -1118,7 +1099,7 @@ class Make
 
         $IBSCBS->appendChild($valores);
 
-        if (isset($std->imovelobra)){
+        if (isset($std->imovelobra)) {
 
             $imovelobra = $this->dom->createElement("imovelobra");
 
@@ -1139,7 +1120,7 @@ class Make
                 "Inscrição imobiliária fiscal."
             );
 
-            if ($std->imovelobra->cCIB) {   
+            if ($std->imovelobra->cCIB) {
                 $this->dom->addChild(
                     $imovelobra,
                     "cCIB",
@@ -1154,7 +1135,7 @@ class Make
                     $std->imovelobra->cObra,
                     false,
                     "Código de classificação tributária."
-                );   
+                );
             } else if ($std->imovelobra->end) {
                 $this->dom->addChild(
                     $imovelobra,
@@ -1162,7 +1143,7 @@ class Make
                     $std->imovelobra->end,
                     false,
                     "Código de classificação tributária."
-                );   
+                );
             }
 
             $IBSCBS->appendChild($imovelobra);

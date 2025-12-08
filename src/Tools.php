@@ -28,11 +28,11 @@ class Tools extends ToolsCommon
         }
         //remove all invalid strings
         $request = Strings::clearXmlString($request);
-
+        var_dump($this->tpAmb);
         if ($this->tpAmb == '1') {
-            $servico = 'EnvioRPS';
+            $servico = 'EnvioLoteRPS';
         } else {
-            $servico = 'TesteEnvioRPS';
+            $servico = 'TesteEnvioLoteRPS';
         }
 
         $this->servico(
@@ -59,7 +59,7 @@ class Tools extends ToolsCommon
         $request = Signer::sign(
             $this->certificate,
             $request,
-            'PedidoEnvioRPS',
+            'PedidoEnvioLoteRPS',
             'Id',
             $this->algorithm,
             $this->canonical
@@ -67,7 +67,9 @@ class Tools extends ToolsCommon
 
         $this->lastRequest = $request;
 
-        $this->isValid($this->versao, $request, 'PedidoEnvioRPS');
+        var_dump($request);
+
+        $this->isValid($this->versao, $request, 'PedidoEnvioLoteRPS');
 
         $parameters = ['EnvioLoteRPS' => $request];
 

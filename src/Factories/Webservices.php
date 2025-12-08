@@ -22,7 +22,7 @@ class Webservices
 {
     public $json;
     public $std;
-    
+
     /**
      * Constructor
      * @param string $xml path or xml content from
@@ -32,7 +32,7 @@ class Webservices
     {
         $this->toStd($xml);
     }
-    
+
     /**
      * Get webservices parameters for specific conditions
      * the parameters with the authorizers are in a json file in
@@ -49,7 +49,7 @@ class Webservices
         if (!key_exists($sigla, $autorizadores[$modelo])) {
             throw new \RuntimeException(
                 "Não existe o autorizador [$sigla] para os "
-                . "webservices do modelo [$modelo]"
+                    . "webservices do modelo [$modelo]"
             );
         }
         $auto = $autorizadores[$modelo][$sigla];
@@ -57,8 +57,6 @@ class Webservices
         if (empty($auto) || empty($this->std)) {
             return false;
         }
-        
-
 
         if (empty($this->std->$auto)) {
             throw new \RuntimeException(
@@ -96,7 +94,7 @@ class Webservices
         }
         return $this->std;
     }
-    
+
     /**
      * Return WS parameters in json format
      * @return string
@@ -105,7 +103,7 @@ class Webservices
     {
         return (string) $this->json;
     }
-    
+
     /**
      * Read WS xml and convert to json and stdClass
      * @param string $xml
@@ -127,7 +125,7 @@ class Webservices
         $this->json = json_encode($aWS);
         $this->std = json_decode(json_encode($aWS));
     }
-    
+
     /**
      * Extract data from wbservices XML strorage to a array
      * @param SimpleXMLElement $node

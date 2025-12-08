@@ -18,7 +18,7 @@ namespace NFePHP\NFs\SP\Common;
 use SoapHeader;
 use NFePHP\Common\TimeZoneByUF;
 use NFePHP\Common\UFList;
-use NFePHP\Common\Soap\SoapCurl;
+use NFePHP\NFs\SP\Soap\SoapCurl;
 use NFePHP\Common\Soap\SoapInterface;
 use NFePHP\Common\Certificate;
 use NFePHP\NFs\SP\Factories\Webservices;
@@ -153,14 +153,15 @@ class Tools
     protected $soapnamespaces = [
         'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
         'xmlns:xsd' => "http://www.w3.org/2001/XMLSchema",
-        'xmlns:soap' => "http://www.w3.org/2003/05/soap-envelope",
+        'xmlns:soap' => "http://schemas.xmlsoap.org/soap/envelope/",
     ];
 
     /**
      * @var array
      */
     protected $availableVersions = [
-        '1' => 'PL_NFSe_2',
+        '1' => 'PL_NFSe_1',
+        '2' => 'PL_NFSe_2',
     ];
 
     /**
@@ -253,6 +254,7 @@ class Tools
         $file = $this->pathwsfiles
             . "wsnfse_" . $this->versao . ".xml";
 
+
         if (! file_exists($file)) {
             return '';
         }
@@ -331,6 +333,7 @@ class Tools
     ) {
 
         $ambiente = $tpAmb == 1 ? "producao" : "homologacao";
+
         $webs = new Webservices($this->getXmlUrlPath());
         $sigla = $uf;
 
@@ -440,7 +443,7 @@ class Tools
 
         $mensagemXML = $this->stringTransform($mensagemXML);
 
-        $request = "<VersaoSchema>$this->versao</VersaoSchema><MensagemXML>$mensagemXML</MensagemXML>";
+        $request = "<versaoSchema>$this->versao</versaoSchema><MensagemXML>$mensagemXML</MensagemXML>";
 
         $body = "<" . $method . "Request xmlns=\"$this->urlPortal\">" . $request . "</" . $method . "Request>";
 

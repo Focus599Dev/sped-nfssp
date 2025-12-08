@@ -4,30 +4,23 @@
         <sigla>SP</sigla>
         <homologacao>
             <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas'
-                version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</PedidoConsultaNFePeriodo>
-            <EnvioRPS method='EnvioLoteRpsAsync' operation='envioLoteRpsAsync' version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</EnvioRPS>
-            <TesteEnvioRPS method='testeEnvioLoteRPSAsync' operation='testeEnvioLoteRPSAsync'
-                version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL
-            </TesteEnvioRPS>
-            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</ConsultaNFe>
-            <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</CancelamentoNFe>
+                version='1'>https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</PedidoConsultaNFePeriodo>
+            <EnvioRPS method='EnvioRPS' operation='envioRPS' version='1'>
+                https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</EnvioRPS>
+            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='1'>
+                https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</ConsultaNFe>
+            <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='1'>
+                https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</CancelamentoNFe>
         </homologacao>
         <producao>
             <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas'
-                version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</PedidoConsultaNFePeriodo>
-            <EnvioRPS method='EnvioLoteRpsAsync' operation='envioLoteRpsAsync' version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</EnvioRPS>
-            <TesteEnvioRPS method='testeEnvioLoteRPSAsync' operation='testeEnvioLoteRPSAsync'
-                version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</TesteEnvioRPS>
-            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</ConsultaNFe>
-            <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='2'>
-                https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx?WSDL</CancelamentoNFe>
+                version='1'>https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</PedidoConsultaNFePeriodo>
+            <EnvioRPS method='EnvioRPS' operation='envioRPS' version='1'>
+                https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</EnvioRPS>
+            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='1'>
+                https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</ConsultaNFe>
+            <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='1'>
+                https://nfe.prefeitura.sp.gov.br/ws/lotenfe.asmx</CancelamentoNFe>
         </producao>
     </UF>
 </WS>
