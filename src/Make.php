@@ -34,7 +34,7 @@ class Make
      */
     public $dom;
 
-    public $version = 1;
+    public $version = 2;
 
     protected $soapnamespaces = [
         // 'xmlns:xsi' => "http://www.w3.org/2001/XMLSchema-instance",
@@ -353,7 +353,7 @@ class Make
             $RPS,
             "ValorCOFINS",
             $std->ValorCOFINS,
-            false,
+            true,
             "Informe o valor da retenção do COFINS."
         );
 
@@ -361,7 +361,7 @@ class Make
             $RPS,
             "ValorINSS",
             $std->ValorINSS,
-            false,
+            true,
             "Informe o valor da retenção do INSS."
         );
 
@@ -369,7 +369,7 @@ class Make
             $RPS,
             "ValorIR",
             $std->ValorIR,
-            false,
+            true,
             "Informe o valor da retenção do IR."
         );
 
@@ -377,7 +377,7 @@ class Make
             $RPS,
             "ValorCSLL",
             $std->ValorCSLL,
-            false,
+            true,
             "Informe o valor da retenção do CSLL."
         );
 
@@ -1072,8 +1072,6 @@ class Make
 
             $gIBSCBS = $this->dom->createElement("gIBSCBS");
 
-            $gTribRegular = $this->dom->createElement("gTribRegular");
-
             $this->dom->addChild(
                 $gIBSCBS,
                 "cClassTrib",
@@ -1082,15 +1080,19 @@ class Make
                 "Código de classificação tributária."
             );
 
-            $this->dom->addChild(
-                $gTribRegular,
-                "cClassTribReg",
-                $std->trib->cClassTribReg,
-                true,
-                "Código de classificação tributária."
-            );
+            if ($std->trib->cClassTribReg){
+                $gTribRegular = $this->dom->createElement("gTribRegular");
 
-            $gIBSCBS->appendChild($gTribRegular);
+                $this->dom->addChild(
+                    $gTribRegular,
+                    "cClassTribReg",
+                    $std->trib->cClassTribReg,
+                    true,
+                    "Código de classificação tributária."
+                );
+
+                $gIBSCBS->appendChild($gTribRegular);
+            }
 
             $trib->appendChild($gIBSCBS);
 
@@ -1263,9 +1265,12 @@ class Make
     public function GenerateXMLConsultaNFe($cnpj = '', $InscricaoPrestador = '', $NumeroRPS = '', $SerieRPS = '', $NumeroNFe = '')
     {
 
+        $this->version = '1';
+
         $PedidoConsultaNFe = $this->dom->createElement("PedidoConsultaNFe");
 
         $PedidoConsultaNFe->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
+        $PedidoConsultaNFe->setAttribute('xmlns:tipos', 'http://www.prefeitura.sp.gov.br/nfe/tipos');
 
         $cabecalho = $this->dom->createElement('Cabecalho');
 
@@ -1419,6 +1424,42 @@ class Make
         $this->dom->appChild($PedidoConsultaNFePeriodo, $cabecalho, 'Falta tag "Cabecalho"');
 
         $this->dom->appendChild($PedidoConsultaNFePeriodo);
+
+        return $this->dom->saveXML();
+    }
+
+    public function GenerateXMLConsultaSituacaoNFe($cnpj = '', $InscricaoPrestador = '', $numeroProtocolo = '')
+    {
+
+        $PedidoConsultaNFe = $this->dom->createElement("nfe:PedidoConsultaSituacaoLote");
+
+        $PedidoConsultaNFe->setAttribute('xmlns:nfe', 'http://www.prefeitura.sp.gov.br/nfe');
+        
+        $PedidoConsultaNFe->setAttribute('xmlns:tipo', 'http://www.prefeitura.sp.gov.br/nfe/tipos');
+        
+        $PedidoConsultaNFe->setAttribute('xmlns:async', 'http://www.prefeitura.sp.gov.br/nfe/tipos');
+
+        $CPFCNPJRemetente = $this->dom->createElement("CPFCNPJRemetente");
+
+        $this->dom->addChild(
+            $CPFCNPJRemetente,
+            "CNPJ",
+            Strings::replaceSpecialsChars(trim($cnpj)),
+            true,
+            "CNPJ"
+        );
+
+        $this->dom->appChild($PedidoConsultaNFe, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
+
+        $this->dom->addChild(
+            $PedidoConsultaNFe,
+            "NumeroProtocolo",
+            $numeroProtocolo,
+            true,
+            "NumeroProtocolo"
+        );
+
+        $this->dom->appendChild($PedidoConsultaNFe);
 
         return $this->dom->saveXML();
     }

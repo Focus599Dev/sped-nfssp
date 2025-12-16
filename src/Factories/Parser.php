@@ -68,7 +68,7 @@ class Parser
      * Configure environment to correct NFSe layout
      * @param string $version
      */
-    public function __construct($version = '1')
+    public function __construct($version = '2')
     {
 
         $ver = str_replace('.', '', $version);
@@ -253,7 +253,6 @@ class Parser
      */
     private function h02Entity($std)
     {
-
         $this->RPS = (object) array_merge((array) $this->RPS, (array) $std);
     }
 

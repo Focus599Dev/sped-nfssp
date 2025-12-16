@@ -58,8 +58,9 @@ class Convert {
         if (!empty($txt)) {
             $this->txt = trim($txt);
         }
-        
-        $txt = Strings::removeSomeAlienCharsfromTxt($this->txt);
+
+        // $txt = Strings::removeSomeAlienCharsfromTxt($this->txt);
+        $txt = $this->txt;
 
         if (!$this->isNFSe($txt)) {
             throw DocumentsException::wrongDocument(12, '');
@@ -188,7 +189,7 @@ class Convert {
      * Valid all NFSe in txt and get layout version for each nfe
     */
     protected function validNotas() {
-        
+
         foreach ($this->notas as $nota) {
 
             $this->loadLayouts($nota);

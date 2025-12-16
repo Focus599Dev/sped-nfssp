@@ -4,16 +4,18 @@
         <sigla>SP</sigla>
         <homologacao>
             <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</PedidoConsultaNFePeriodo>
-            <EnvioLoteRPS method='EnvioLoteRpsAsync' operation='envioLoteRpsAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</EnvioLoteRPS>
-            <TesteEnvioLoteRPS method='testeEnvioLoteRPSAsync' operation='testeEnvioLoteRPSAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</TesteEnvioLoteRPS>
-            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</ConsultaNFe>
+            <EnvioLoteRPS method='envioLoteRPS' operation='envioLoteRPS' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx?</EnvioLoteRPS>
+            <TesteEnvioLoteRPS method='TesteEnvioLoteRPS' operation='testeenvio' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</TesteEnvioLoteRPS>
+            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</ConsultaNFe>
+            <ConsultaSituacaoNFe method='ConsultaSituacaoLote' operation='consultaSituacaoLote' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</ConsultaSituacaoNFe>
             <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</CancelamentoNFe>
         </homologacao>
         <producao>
             <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</PedidoConsultaNFePeriodo>
-            <EnvioLoteRPS method='EnvioLoteRpsAsync' operation='envioLoteRpsAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</EnvioLoteRPS>
-            <TesteEnvioLoteRPS method='testeEnvioLoteRPSAsync' operation='testeEnvioLoteRPSAsync' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</TesteEnvioLoteRPS>
-            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</ConsultaNFe>
+            <EnvioLoteRPS method='envioLoteRPS' operation='envioLoteRPS' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</EnvioLoteRPS>
+            <TesteEnvioLoteRPS method='TesteEnvioLoteRPS' operation='testeenvio' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</TesteEnvioLoteRPS>
+            <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</ConsultaNFe>
+            <ConsultaSituacaoNFe method='ConsultaSituacaoLote' operation='consultaSituacaoLote' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</ConsultaSituacaoNFe>
             <CancelamentoNFe method='CancelamentoNFe' operation='CancelamentoNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfeasync.asmx</CancelamentoNFe>
         </producao>
     </UF>

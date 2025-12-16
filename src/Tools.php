@@ -28,7 +28,7 @@ class Tools extends ToolsCommon
         }
         //remove all invalid strings
         $request = Strings::clearXmlString($request);
-        var_dump($this->tpAmb);
+
         if ($this->tpAmb == '1') {
             $servico = 'EnvioLoteRPS';
         } else {
@@ -66,8 +66,6 @@ class Tools extends ToolsCommon
         );
 
         $this->lastRequest = $request;
-
-        var_dump($request);
 
         $this->isValid($this->versao, $request, 'PedidoEnvioLoteRPS');
 
@@ -145,7 +143,7 @@ class Tools extends ToolsCommon
      * @param stdClass $data {InscricaoPrestador:'', cnpj: '', NumeroRPS: '', SerieRPS: '', NumeroNFe: ''}
      * @return string
      */
-    public function ConsultaNFe(
+    public function ConsultaNFse(
         \stdClass $data
     ) {
 
@@ -168,7 +166,8 @@ class Tools extends ToolsCommon
             'PedidoConsultaNFe',
             '',
             $this->algorithm,
-            $this->canonical
+            // change default canonical
+            [false,false,null,null]
         );
 
         $this->isValid($this->urlVersion, $request, 'PedidoConsultaNFe');
@@ -176,7 +175,7 @@ class Tools extends ToolsCommon
         $body = $this->makeBody('ConsultaNFe', $request);
 
         $parameters = [
-            'ConsultaNFeRequest' => $request
+            'ConsultaNFe' => $request
         ];
         //este webservice não requer cabeçalho
         $this->objHeader = null;
@@ -234,6 +233,55 @@ class Tools extends ToolsCommon
             'CancelamentoNFe' => $request
         ];
 
+        //este webservice não requer cabeçalho
+        $this->objHeader = null;
+
+        $this->lastResponse = $this->sendRequest($body, $parameters);
+
+        $this->lastResponse = $this->removeStuffs($this->lastResponse);
+
+        return $this->lastResponse;
+    }
+
+    /**
+     * Serviço Consulta NFE
+     * de interesse do remetente
+     * @param stdClass $data {InscricaoPrestador:'', cnpj: '', NumeroRPS: '', SerieRPS: '', NumeroNFe: ''}
+     * @return string
+     */
+    public function ConsultaSituacaoNFs(
+        \stdClass $data
+    ) {
+
+        $servico = 'ConsultaSituacaoNFe';
+
+        $this->servico(
+            $servico,
+            'SP',
+            $this->tpAmb,
+            true
+        );
+
+        $makeXML = new Make();
+
+        $request = $makeXML->GenerateXMLConsultaSituacaoNFe($data->cnpj, $data->InscricaoPrestador, $data->numeroProtocolo);
+
+        // $request = Signer::sign(
+        //     $this->certificate,
+        //     $consulta,
+        //     'PedidoConsultaSituacaoNFe',
+        //     '',
+        //     $this->algorithm,
+        //     $this->canonical
+        // );
+
+        // $this->isValid($this->urlVersion, $request, 'PedidoConsultaNFe');
+
+        $body = $this->makeBody('ConsultaSituacaoLote', $request);
+
+        $parameters = [
+            'ConsultaSituacaoLote' => $request
+        ];
         //este webservice não requer cabeçalho
         $this->objHeader = null;
 

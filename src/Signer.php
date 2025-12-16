@@ -102,9 +102,9 @@ class Signer extends SignerCommon
 
         if ($node->length) {
 
-            $node = str_pad($node->item(0)->nodeValue, 8, '0', STR_PAD_LEFT);
+            $node = str_pad($node->item(0)->nodeValue,12, '0', STR_PAD_LEFT);
         } else
-            $node = str_pad('', 8, '0', STR_PAD_LEFT);
+            $node = str_pad('', 12, '0', STR_PAD_LEFT);
 
         $textAss .= $node;
 
@@ -173,8 +173,11 @@ class Signer extends SignerCommon
 
         $textAss .= $node;
 
-        $node = $dom->getElementsByTagName('ValorServicos');
+        $node = $dom->getElementsByTagName('ValorFinalCobrado');
 
+        if (!$node->length) {
+            $node = $dom->getElementsByTagName('ValorInicialCobrado');
+        }
         if ($node->length) {
 
             $node = str_pad(self::removePointAndComa(self::equalizeDecimalPlaces($node->item(0)->nodeValue, 2)), 15, '0', STR_PAD_LEFT);
