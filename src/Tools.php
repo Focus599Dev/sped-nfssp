@@ -29,11 +29,13 @@ class Tools extends ToolsCommon
         //remove all invalid strings
         $request = Strings::clearXmlString($request);
 
-        if ($this->tpAmb == '1') {
-            $servico = 'EnvioLoteRPS';
-        } else {
-            $servico = 'TesteEnvioLoteRPS';
-        }
+        $servico = 'EnvioRPS';
+
+        // if ($this->tpAmb == '1') {
+        //     $servico = 'EnvioLoteRPS';
+        // } else {
+        //     $servico = 'TesteEnvioLoteRPS';
+        // }
 
         $this->servico(
             $servico,
@@ -41,11 +43,20 @@ class Tools extends ToolsCommon
             $this->tpAmb
         );
 
-        $request = Signer::assinatura(
-            $this->certificate,
-            $request,
-            OPENSSL_ALGO_SHA1
-        );
+        if ($this->versao == '2') {
+            $request = Signer::assinaturav2(
+                $this->certificate,
+                $request,
+                OPENSSL_ALGO_SHA1
+            );
+        } else {
+            
+            $request = Signer::assinaturav1(
+                $this->certificate,
+                $request,
+                OPENSSL_ALGO_SHA1
+            );
+        }
 
         // $request = Signer::sign(
         //     $this->certificate,
@@ -59,7 +70,7 @@ class Tools extends ToolsCommon
         $request = Signer::sign(
             $this->certificate,
             $request,
-            'PedidoEnvioLoteRPS',
+            'PedidoEnvioRPS',
             'Id',
             $this->algorithm,
             $this->canonical
@@ -67,16 +78,16 @@ class Tools extends ToolsCommon
 
         $this->lastRequest = $request;
 
-        $this->isValid($this->versao, $request, 'PedidoEnvioLoteRPS');
+        $this->isValid($this->versao, $request, 'PedidoEnvioRPS');
 
-        $parameters = ['EnvioLoteRPS' => $request];
+        $parameters = ['EnvioRPS' => $request];
 
         $request = $this->makeBody($servico, $request);
 
         $this->lastResponse = $this->sendRequest($request, $parameters);
 
         $this->lastResponse = $this->removeStuffs($this->lastResponse);
-
+        
         return $this->lastResponse;
     }
 
@@ -158,7 +169,9 @@ class Tools extends ToolsCommon
 
         $makeXML = new Make();
 
-        $consulta = $makeXML->GenerateXMLConsultaNFe($data->cnpj, $data->InscricaoPrestador, $data->NumeroRPS, $data->SerieRPS, $data->NumeroNFe);
+        $makeXML->setVersion($this->versao);
+    
+        $consulta = $makeXML->GenerateXMLConsultaNFe($data->cnpj, $data->InscricaoPrestador, $data->NumeroRPS, $data->SerieRPS, $data->NumeroNFe, $this->versao);
 
         $request = Signer::sign(
             $this->certificate,
@@ -171,7 +184,7 @@ class Tools extends ToolsCommon
         );
 
         $this->isValid($this->urlVersion, $request, 'PedidoConsultaNFe');
-
+        
         $body = $this->makeBody('ConsultaNFe', $request);
 
         $parameters = [
@@ -184,6 +197,8 @@ class Tools extends ToolsCommon
 
         $this->lastResponse = $this->removeStuffs($this->lastResponse);
 
+        var_dump($body);
+        var_dump($this->lastResponse);
         return $this->lastResponse;
     }
 

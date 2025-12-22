@@ -88,22 +88,22 @@ class Make
     public function monta()
     {
 
-        $PedidoEnvioLoteRPS = $this->dom->createElement('PedidoEnvioLoteRPS');
+        $PedidoEnvioRPS = $this->dom->createElement('PedidoEnvioRPS');
 
         foreach ($this->soapnamespaces as $key => $namespace) {
 
-            $PedidoEnvioLoteRPS->setAttribute($key, $namespace);
+            $PedidoEnvioRPS->setAttribute($key, $namespace);
         }
 
-        $this->dom->appChild($PedidoEnvioLoteRPS, $this->Cabecalho, 'Falta tag "Cabecalho"');
+        $this->dom->appChild($PedidoEnvioRPS, $this->Cabecalho, 'Falta tag "Cabecalho"');
 
         if ($this->IBSCBS) {
             $this->RPS->appendChild($this->IBSCBS);
         }
 
-        $this->dom->appChild($PedidoEnvioLoteRPS, $this->RPS, 'Falta tag "RPS"');
+        $this->dom->appChild($PedidoEnvioRPS, $this->RPS, 'Falta tag "RPS"');
 
-        $this->dom->appendChild($PedidoEnvioLoteRPS);
+        $this->dom->appendChild($PedidoEnvioRPS);
 
         $this->xml = $this->dom->saveXML();
 
@@ -128,6 +128,8 @@ class Make
             'QtdRPS',
         ];
 
+        $this->version = $std->versao;
+
         $std = $this->equilizeParameters($std, $possible);
 
         $Cabecalho = $this->dom->createElement("Cabecalho");
@@ -148,37 +150,40 @@ class Make
 
         $this->dom->appChild($Cabecalho, $CPFCNPJRemetente, 'Falta tag "Cabecalho"');
 
-        $this->dom->addChild(
-            $Cabecalho,
-            "transacao",
-            $std->transacao,
-            false,
-            "Informe se os RPS a serem substituídos por NFS-e farão parte de uma mesma transação. True - Os RPS só serão substituídos por NFS-e se não ocorrer nenhum evento de erro durante o processamento de todo o lote; False - Os RPS válidos serão substituídos por NFS-e, mesmo que ocorram eventos de erro durante processamento de outros RPS deste lote."
-        );
+        if ($this->version == 2){
+            
+            // $this->dom->addChild(
+            //     $Cabecalho,
+            //     "transacao",
+            //     $std->transacao,
+            //     false,
+            //     "Informe se os RPS a serem substituídos por NFS-e farão parte de uma mesma transação. True - Os RPS só serão substituídos por NFS-e se não ocorrer nenhum evento de erro durante o processamento de todo o lote; False - Os RPS válidos serão substituídos por NFS-e, mesmo que ocorram eventos de erro durante processamento de outros RPS deste lote."
+            // );
 
-        $this->dom->addChild(
-            $Cabecalho,
-            "dtInicio",
-            $std->dtInicio,
-            true,
-            "Informe a data de início do período transmitido (AAAA-MM-DD)."
-        );
+            // $this->dom->addChild(
+            //     $Cabecalho,
+            //     "dtInicio",
+            //     $std->dtInicio,
+            //     true,
+            //     "Informe a data de início do período transmitido (AAAA-MM-DD)."
+            // );
 
-        $this->dom->addChild(
-            $Cabecalho,
-            "dtFim",
-            $std->dtFim,
-            true,
-            "Informe a data final do período transmitido (AAAA-MM-DD)."
-        );
+            // $this->dom->addChild(
+            //     $Cabecalho,
+            //     "dtFim",
+            //     $std->dtFim,
+            //     true,
+            //     "Informe a data final do período transmitido (AAAA-MM-DD)."
+            // );
 
-        $this->dom->addChild(
-            $Cabecalho,
-            "QtdRPS",
-            $std->QtdRPS,
-            true,
-            "Informe o total de RPS contidos na mensagem XML."
-        );
+            // $this->dom->addChild(
+            //     $Cabecalho,
+            //     "QtdRPS",
+            //     $std->QtdRPS,
+            //     true,
+            //     "Informe o total de RPS contidos na mensagem XML."
+            // );
+        }
 
         $this->Cabecalho = $Cabecalho;
 
@@ -325,13 +330,16 @@ class Make
             "Informe o tipo de tributação do RPS."
         );
 
-        // $this->dom->addChild(
-        //     $RPS,
-        //     "ValorServicos",
-        //     $std->ValorServicos,
-        //     true,
-        //     "Informe o valor dos serviços prestados."
-        // );
+        if ($this->version == 1){
+            
+            $this->dom->addChild(
+                $RPS,
+                "ValorServicos",
+                $std->ValorServicos,
+                true,
+                "Informe o valor dos serviços prestados."
+            );
+        }
 
         $this->dom->addChild(
             $RPS,
@@ -648,104 +656,109 @@ class Make
             "Informe o valor total recebido.."
         );
 
-        if ($std->ValorInicialCobrado) {
+        if ($this->version == 2){
+            
+            if ($std->ValorInicialCobrado) {
+                
+                $this->dom->addChild(
+                    $RPS,
+                    "ValorInicialCobrado",
+                    $std->ValorInicialCobrado,
+                    false,
+                    "Informe o valor inicial cobrado."
+                );
+            } else if ($std->ValorFinalCobrado) {
+                
+                $this->dom->addChild(
+                    $RPS,
+                    "ValorFinalCobrado",
+                    $std->ValorFinalCobrado,
+                    false,
+                    "Informe o valor final cobrado."
+                );
+            }
+
             $this->dom->addChild(
                 $RPS,
-                "ValorInicialCobrado",
-                $std->ValorInicialCobrado,
+                "ValorMulta",
+                $std->ValorMulta,
                 false,
-                "Informe o valor inicial cobrado."
+                "Valor da multa."
             );
-        } else if ($std->ValorFinalCobrado) {
+
             $this->dom->addChild(
                 $RPS,
-                "ValorFinalCobrado",
-                $std->ValorFinalCobrado,
+                "ValorJuros",
+                $std->ValorJuros,
                 false,
-                "Informe o valor final cobrado."
+                "Valor do juros."
             );
-        }
 
-        $this->dom->addChild(
-            $RPS,
-            "ValorMulta",
-            $std->ValorMulta,
-            false,
-            "Valor da multa."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "ValorJuros",
-            $std->ValorJuros,
-            false,
-            "Valor do juros."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "ValorIPI",
-            $std->ValorIPI,
-            true,
-            "Valor do IPI."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "ExigibilidadeSuspensa",
-            $std->ExigibilidadeSuspensa ? 1 : 0,
-            true,
-            "Exigibilidade Suspensa."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "PagamentoParceladoAntecipado",
-            $std->PagamentoParceladoAntecipado ? 1 : 0,
-            true,
-            "Pagamento Parcelado Antecipado."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "NCM",
-            $std->NCM,
-            false,
-            "Informe o número NCM (Nomenclatura Comum do Mercosul)."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "NBS",
-            $std->NBS,
-            true,
-            "Informe o número NBS (Nomenclatura Brasileira de Serviços)."
-        );
-
-        $this->dom->addChild(
-            $RPS,
-            "atvEvento",
-            $std->atvEvento,
-            false,
-            "Informações dos Tipos de evento."
-        );
-
-        if ($std->cLocPrestacao) {
             $this->dom->addChild(
                 $RPS,
-                "cLocPrestacao",
-                $std->cLocPrestacao,
+                "ValorIPI",
+                $std->ValorIPI,
                 true,
-                "Informações do local de prestação."
+                "Valor do IPI."
             );
-        } else {
+
             $this->dom->addChild(
                 $RPS,
-                "cPaisPrestacao",
-                $std->cPaisPrestacao,
+                "ExigibilidadeSuspensa",
+                $std->ExigibilidadeSuspensa ? 1 : 0,
                 true,
-                "Informações do país de prestação."
+                "Exigibilidade Suspensa."
             );
+
+            $this->dom->addChild(
+                $RPS,
+                "PagamentoParceladoAntecipado",
+                $std->PagamentoParceladoAntecipado ? 1 : 0,
+                true,
+                "Pagamento Parcelado Antecipado."
+            );
+
+            $this->dom->addChild(
+                $RPS,
+                "NCM",
+                $std->NCM,
+                false,
+                "Informe o número NCM (Nomenclatura Comum do Mercosul)."
+            );
+
+            $this->dom->addChild(
+                $RPS,
+                "NBS",
+                $std->NBS,
+                true,
+                "Informe o número NBS (Nomenclatura Brasileira de Serviços)."
+            );
+
+            $this->dom->addChild(
+                $RPS,
+                "atvEvento",
+                $std->atvEvento,
+                false,
+                "Informações dos Tipos de evento."
+            );
+
+            if ($std->cLocPrestacao) {
+                $this->dom->addChild(
+                    $RPS,
+                    "cLocPrestacao",
+                    $std->cLocPrestacao,
+                    true,
+                    "Informações do local de prestação."
+                );
+            } else {
+                $this->dom->addChild(
+                    $RPS,
+                    "cPaisPrestacao",
+                    $std->cPaisPrestacao,
+                    true,
+                    "Informações do país de prestação."
+                );
+            }
         }
 
         $this->RPS = $RPS;
@@ -755,6 +768,12 @@ class Make
 
     public function buildIBSCBS($std)
     {
+
+        if ($this->version == 1){
+            // tag exclusiva do layout 2
+            return;
+        }
+
         $possible = [
             "finNFSe",
             "indFinal",
@@ -1265,11 +1284,10 @@ class Make
     public function GenerateXMLConsultaNFe($cnpj = '', $InscricaoPrestador = '', $NumeroRPS = '', $SerieRPS = '', $NumeroNFe = '')
     {
 
-        $this->version = '1';
-
         $PedidoConsultaNFe = $this->dom->createElement("PedidoConsultaNFe");
 
         $PedidoConsultaNFe->setAttribute('xmlns', 'http://www.prefeitura.sp.gov.br/nfe');
+        
         $PedidoConsultaNFe->setAttribute('xmlns:tipos', 'http://www.prefeitura.sp.gov.br/nfe/tipos');
 
         $cabecalho = $this->dom->createElement('Cabecalho');
@@ -1469,4 +1487,5 @@ class Make
 
         return preg_replace('/(-|,|\.)/', '', $text);
     }
+
 }

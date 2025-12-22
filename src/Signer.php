@@ -4,16 +4,6 @@ namespace NFePHP\NFs\SP;
 
 /**
  * Class to signner a Xml
- * Meets packages :
- *     sped-nfe,
- *     sped-cte,
- *     sped-mdfe,
- *     sped-nfse,
- *     sped-efinanceira
- *     sped-esocial
- *     sped-efdreinf
- *     e sped-esfinge
- *
  * @category  NFePHP
  * @package   NFePHP\NFs\SP
  * @copyright NFePHP Copyright (c) 2016
@@ -37,22 +27,45 @@ use DOMElement;
 class Signer extends SignerCommon
 {
 
-    public static function assinatura($certificate, $xml, $algorithm)
-    {
+    public static function assinaturav1( $certificate,$xml,$algorithm){
 
         $dom = new DOMDocument('1.0', 'UTF-8');
 
         $dom->loadXML($xml);
-
+        
         $dom->preserveWhiteSpace = false;
-
+        
         $dom->formatOutput = false;
-
+        
         $root = $dom->getElementsByTagName('RPS');
 
-        $textAss = self::getDataAssinatura($dom);
+        $textAss = self::getDataAssinaturav1($dom);
 
-        $signature = base64_encode($certificate->sign($textAss, $algorithm));
+        return self::assinatura($textAss , $dom, $certificate, $algorithm);
+    }
+
+    public static function assinaturav2( $certificate,$xml,$algorithm){
+
+        $dom = new DOMDocument('1.0', 'UTF-8');
+
+        $dom->loadXML($xml);
+        
+        $dom->preserveWhiteSpace = false;
+        
+        $dom->formatOutput = false;
+        
+        $root = $dom->getElementsByTagName('RPS');
+
+        $textAss = self::getDataAssinaturav2($dom);
+
+        return self::assinatura($textAss , $dom, $certificate, $algorithm);
+    }
+
+    public static function assinatura( $textAss , $dom, $certificate, $algorithm){
+        
+        $root = $dom->getElementsByTagName('RPS');
+        
+        $signature = base64_encode($certificate->sign($textAss, $algorithm)); 
 
         $content = $root->item(0)->firstChild;
 
@@ -92,7 +105,7 @@ class Signer extends SignerCommon
     }
 
 
-    private static function getDataAssinatura($dom)
+    private static function getDataAssinaturav2($dom)
     {
 
         $textAss = '';
@@ -277,6 +290,206 @@ class Signer extends SignerCommon
                 $node = 'N';
 
             $textAss .= $node;
+        }
+
+        return $textAss;
+    }
+
+    private static function getDataAssinaturav1($dom){
+
+        $textAss = '';
+
+        // inscrição municipal prestador
+        $node = $dom->getElementsByTagName('InscricaoPrestador');
+
+        if ($node->length){
+            
+            $node = str_pad($node->item(0)->nodeValue, 8, '0', STR_PAD_LEFT);
+
+        } else 
+            $node = str_pad('', 8, '0', STR_PAD_LEFT);
+
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('SerieRPS');
+
+        if ($node->length){
+            
+            $node = str_pad($node->item(0)->nodeValue, 5,chr(32), STR_PAD_RIGHT);
+
+        } else {
+            $node = str_pad('', 5, chr(32), STR_PAD_RIGHT);
+        }
+
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('NumeroRPS');
+
+        if ($node->length){
+            
+            $node = str_pad($node->item(0)->nodeValue, 12, '0', STR_PAD_LEFT);
+
+        } else 
+            $node = str_pad('', 12, '0', STR_PAD_LEFT);
+
+        $textAss .= $node;
+        
+
+        $node = $dom->getElementsByTagName('DataEmissao');
+        
+        if ($node->length){
+            
+            $node = self::removePointAndComa($node->item(0)->nodeValue);
+
+        } else 
+            $node = str_pad('', 8, chr(32), STR_PAD_LEFT);
+
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('TributacaoRPS');
+        
+        if ($node->length){
+            
+            $node = $node->item(0)->nodeValue;
+
+        } else 
+            $node = chr(32);
+
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('StatusRPS');
+        
+        if ($node->length){
+            
+            $node = $node->item(0)->nodeValue;
+
+        } else 
+            $node = chr(32);
+
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('ISSRetido');
+        
+        if ($node->length){
+            
+            if ($node->item(0)->nodeValue == '1')
+                $node = 'S';
+            else 
+                $node = 'N';
+        } else 
+            $node = 'N';
+
+        $textAss .= $node;
+        
+        $node = $dom->getElementsByTagName('ValorServicos');
+        
+        if ($node->length){
+            
+            $node = str_pad( self::removePointAndComa(  self::equalizeDecimalPlaces($node->item(0)->nodeValue, 2) ) , 15, '0', STR_PAD_LEFT);
+           
+        } else 
+            $node = str_pad('' , 15, '0', STR_PAD_LEFT);
+            
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('ValorDeducoes');
+        
+        if ($node->length){
+            
+            $node = str_pad( self::removePointAndComa(  self::equalizeDecimalPlaces($node->item(0)->nodeValue, 2) ) , 15, '0', STR_PAD_LEFT);
+           
+        } else 
+            $node = str_pad('' , 15, '0', STR_PAD_LEFT);
+            
+        $textAss .= $node;
+
+        $node = $dom->getElementsByTagName('CodigoServico');
+        
+        if ($node->length){
+            
+            $node = str_pad( self::removePointAndComa($node->item(0)->nodeValue) , 5, '0', STR_PAD_LEFT);
+           
+        } else 
+            $node = str_pad('' , 5, '0', STR_PAD_LEFT);
+            
+        $textAss .= $node;
+
+        $indCPFCNPJ = 3;
+        
+        $CPFCNPJ = str_pad( '' , 14, '0', STR_PAD_LEFT);
+
+        $node = $dom->getElementsByTagName('CPFCNPJTomador');
+
+        if ($node->length){
+
+            $nodeCPFCNPJ = $node->item(0)->getElementsByTagName('CNPJ');
+
+            if ($nodeCPFCNPJ->length){
+                $indCPFCNPJ = 2;   
+               
+                $CPFCNPJ = $nodeCPFCNPJ->item(0)->nodeValue;
+
+            } else {
+
+                $indCPFCNPJ = 1;
+                
+                $nodeCPFCNPJ = $node->item(0)->getElementsByTagName('CPF');
+
+                $CPFCNPJ = $nodeCPFCNPJ->item(0)->nodeValue;
+                
+            }
+
+            $CPFCNPJ = str_pad( $CPFCNPJ , 14, '0', STR_PAD_LEFT);
+
+            $textAss .= $indCPFCNPJ;
+
+            $textAss .= $CPFCNPJ;
+        }
+
+        $indIntermediario = 3;
+        
+        $CPFCNPJ = str_pad( '' , 14, '0', STR_PAD_LEFT);
+
+        $node = $dom->getElementsByTagName('CPFCNPJIntermediario');
+
+        if ($node->length){
+
+            $nodeCPFCNPJ = $node->item(0)->getElementsByTagName('CNPJ');
+
+            if ($nodeCPFCNPJ->length){
+                $indIntermediario = 2;   
+               
+                $CPFCNPJ = $nodeCPFCNPJ->item(0)->nodeValue;
+
+            } else {
+
+                $indIntermediario = 1;
+                
+                $nodeCPFCNPJ = $node->item(0)->getElementsByTagName('CPF');
+
+                $CPFCNPJ = $nodeCPFCNPJ->item(0)->nodeValue;
+                
+            }
+
+            $CPFCNPJ = str_pad( $CPFCNPJ , 14, '0', STR_PAD_LEFT);
+
+            $textAss .= $indIntermediario;
+
+            $textAss .= $CPFCNPJ;
+    
+            $node = $dom->getElementsByTagName('ISSRetidoIntermediario');
+            
+            if ($node->length){
+                
+                if ($node->item(0)->nodeValue == 'true')
+                    $node = 'S';
+                else 
+                    $node = 'N';
+            } else 
+                $node = 'N';
+    
+            $textAss .= $node;
+
         }
 
         return $textAss;

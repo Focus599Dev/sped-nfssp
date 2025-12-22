@@ -439,19 +439,7 @@ class Tools
     public function makeBody($method, $mensagemXML)
     {
 
-        if (in_array($method, ['ConsultaSituacaoLote'])) {
-            $this->versao = '1';
-            
-            $tagversaoSchema = "<versaoSchema>1</versaoSchema>";
-        } else if (in_array($method, ['ConsultaNFe'])) {
-            $this->versao = '1';
-
-            $tagversaoSchema = "<VersaoSchema>1</VersaoSchema>";
-        } else {
-            $this->versao = '2';
-            
-            $tagversaoSchema = "<VersaoSchema>2</VersaoSchema>";
-        }
+        $tagversaoSchema = "<VersaoSchema>$this->versao</VersaoSchema>";
 
         $mensagemXML = $this->clear($mensagemXML);
 

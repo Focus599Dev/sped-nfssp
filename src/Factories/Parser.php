@@ -122,11 +122,14 @@ class Parser
 
             if (method_exists(__CLASS__, $metodo)) {
 
-                $struct = $this->structure[strtoupper($fields[0])];
+                if (isset($this->structure[strtoupper($fields[0])])) {
+                    
+                    $struct = $this->structure[strtoupper($fields[0])];
 
-                $std = $this->fieldsToStd($fields, $struct);
+                    $std = $this->fieldsToStd($fields, $struct);
 
-                $this->$metodo($std);
+                    $this->$metodo($std);
+                }
             }
         }
 
