@@ -12,7 +12,7 @@
         </homologacao>
         <producao>
             <PedidoConsultaNFePeriodo method='ConsultaNFeRecebidas' operation='consultaNFeRecebidas' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</PedidoConsultaNFePeriodo>
-            <EnvioLoteRPS method='envioLoteRPS' operation='envioLoteRPS' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</EnvioLoteRPS>
+            <EnvioRPS method='EnvioRPS' operation='EnvioRPS' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</EnvioRPS>
             <TesteEnvioLoteRPS method='TesteEnvioLoteRPS' operation='testeenvio' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</TesteEnvioLoteRPS>
             <ConsultaNFe method='ConsultaNFe' operation='ConsultaNFe' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</ConsultaNFe>
             <ConsultaSituacaoNFe method='ConsultaSituacaoLote' operation='consultaSituacaoLote' version='2'>https://nfews.prefeitura.sp.gov.br/lotenfe.asmx</ConsultaSituacaoNFe>
